@@ -119,7 +119,14 @@ let keys = {}
 let setKey = (truth) => (e) => keys[e.key] = truth
 onkeydown = setKey(1)
 onkeyup = setKey()
-onclick = resolveFirstHumanInteraction
+for (let button of document.all){
+  let k = button.getAttribute('key')
+  if (k) {
+    button.onpointerdown = () => keys[k] = 1
+    button.onpointerup = () => keys[k] = 0
+  }
+}
+c.onclick = resolveFirstHumanInteraction
 
 let isKeyPressed = k => !!keys[k]
 

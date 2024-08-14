@@ -120,10 +120,12 @@ let delayed_mov_x = prev_mov_x
 let delayed_mov_y = prev_mov_y
 let delayed_mov_z = prev_mov_z
 let shaking = 0
+let shaking_intensity_period = 0
 
 let drawPlayer = () => {
   // shake our guy with a sin()
   shaking = shaking += 8
+  shaking_intensity_period += 0.1
   hovering += abs(abs(prev_mov_y) - abs(prev_mov_x)) * 0.1
   // burn intensity is 2 components, one is how much harder we're accelerating, and the other is how much we're accelerating in general
   let burn_intensity = clamp(0, 10, 
@@ -158,6 +160,18 @@ let drawPlayer = () => {
   botLeft[0] += (delayed_mov_y - default_mov_y) * 8
   botRight[0] -= (delayed_mov_y - default_mov_y) * 8
 
+  // shake the tip when we go fast
+  let how_fast_to_shake = 1 + (delayed_mov_y - prev_mov_y) * 2
+  let how_much_to_shake = clamp(0, 1, remap(default_mov_y + 0.3, player_speed, 0, 1, delayed_mov_y)) * 0.5 * (sin(shaking_intensity_period) + 0.8)/2
+  tip[0] += cos(shaking * how_fast_to_shake + 10) * how_much_to_shake
+  tip[1] -= cos(shaking * how_fast_to_shake + 10) * how_much_to_shake * .5
+
+  // Raise the tip, lower the bottom, when we jump
+  tip[1] -= prev_mov_z * 5
+  top[1] += prev_mov_z * 8
+  botLeft[1] += prev_mov_z * 4
+  botRight[1] += prev_mov_z * 4
+
   // Lower us when moving X, raise us when moving Y
   for (let coords of [tip, botLeft, botRight, top]) {
     let vertical_offset = -(abs(delayed_mov_x) * 2) + (((delayed_mov_y - default_mov_y)) * 9)
@@ -165,22 +179,12 @@ let drawPlayer = () => {
     // Periodic hovering, but only if offset isn't too harsh
     coords[1] -= lerp(0, sin(hovering) * 4, inv_lerp(0, 4, abs(vertical_offset)))
     // Shake our player when they go fast like sonic
-    let how_fast_to_shake = 1 + (delayed_mov_y - prev_mov_y) * 2
-    let how_much_to_shake = clamp(0, 1, remap(default_mov_y + 0.3, player_speed, 0, 1, delayed_mov_y)) * 2
     coords[0] += sin(shaking * how_fast_to_shake) * how_much_to_shake
 
     // Some rounding+noise
     coords[0] = (round(coords[0] * (5/6))) * (6/5)
     coords[1] = (round(coords[1] * (5/6))) * (6/5)    
   }
-
-  // Also shake the tip individually
-  let how_fast_to_shake = 1 + (delayed_mov_y - prev_mov_y) * 2
-  let how_much_to_shake = clamp(0, 1, remap(default_mov_y + 0.3, player_speed, 0, 1, delayed_mov_y)) * 0.5
-  tip[0] += cos(shaking * how_fast_to_shake + 10) * how_much_to_shake
-  tip[1] -= cos(shaking * how_fast_to_shake + 10) * how_much_to_shake * .5
-
-
 
   ctx.fillStyle = 'black'
   ctx.beginPath()
@@ -207,6 +211,19 @@ let drawPlayer = () => {
   ctx.lineTo(...botLeft)
   ctx.lineTo(...tip)
   ctx.fill()
+
+  // draw the lines, butcher
+  ctx.strokeStyle = 'purple'
+  ctx.beginPath()
+  ctx.moveTo(...tip)
+  ctx.lineTo(...botRight)
+  ctx.lineTo(...top)
+  ctx.lineTo(...tip)
+  ctx.lineTo(...botLeft)
+  ctx.lineTo(...top)
+  ctx.lineTo(...botLeft)
+  ctx.lineTo(...botRight)
+  ctx.stroke()
 
   // Cast a shadow
   ctx.fillStyle = 'rgba(44,0,44,0.44)'
@@ -240,6 +257,7 @@ let drawPlayer = () => {
 
   top[1] -= 1
   ctx.fillStyle = 'orange'
+
   ctx.globalAlpha = burn_intensity > 0.5
     ? Math.sin(burning * 1.5) > (random() - 0.5)
     : (10 * burn_intensity) ** 2

@@ -80,7 +80,7 @@ let drawWorld = () => {
 
   // Draw the abyss
   if (x_start && x_end) {
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'
+    ctx.fillStyle = 'rgba(255,255,255,0.1)'
     ctx.fillRect(abyss_x1, abyss_y1, x_end - x_start, (abyss_h|0) + 2)
   }
 

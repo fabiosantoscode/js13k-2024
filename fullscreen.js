@@ -1,5 +1,5 @@
 if (self.env === 'production') {
     firstUserInteraction.then(() => {
-        c.requestFullscreen?.().catch(identity)
+        document.body.requestFullscreen?.().catch(identity)
     })
 }
