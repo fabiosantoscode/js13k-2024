@@ -2,11 +2,11 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { execSync } from 'child_process'
 import express from 'express'
 import compression from 'compression'
-import {minify} from 'terser'
+import {minify as terserMinify} from 'terser'
 
-async function getHtml(andMinify = true) {
+async function getHtml({ minify = true }) {
     let html = readFileSync('index.html').toString()
-    if (!andMinify) return html
+    if (!minify) return html
 
     const [htmlBody, scripts] = html.split(/<!--\s*snip\s*-->/i)
 
@@ -17,7 +17,7 @@ async function getHtml(andMinify = true) {
 
     console.log(Object.entries(scriptsObj))
 
-    let { code } = await minify(scriptsObj, {
+    let { code } = await terserMinify(scriptsObj, {
         compress: {
             global_defs: {
                 'self.env': 'production'
@@ -37,7 +37,7 @@ async function getHtml(andMinify = true) {
 
 
 async function buildZip() {
-    const html = await getHtml()
+    const html = await getHtml({ minify: true })
 
     mkdirSync('/tmp/js13k/.build', { recursive: true })
     writeFileSync('/tmp/js13k/.build/index.html', html)
@@ -57,7 +57,7 @@ switch (process.argv[2]) {
         app.use(compression())
         app.on('error', err=>{console.error(err)})
         app.get('/', (req, res) => {
-            getHtml(false).then(
+            getHtml({minify: process.argv.includes('--compressed')}).then(
                 html => res.contentType('html').end(html),
                 err => res.end(err.stack)
             )

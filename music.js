@@ -8,8 +8,6 @@ let UNUSED_VAR;
 let VOLUME_MOD = 1
 let DRUM_VOLUME_MOD = 0.04;
 
-let range = n => Array.from({ length: n })
-
 let trimSplit = s => {
   return s.trim().split(/\s+/g)
 }
