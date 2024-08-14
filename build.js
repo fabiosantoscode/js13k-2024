@@ -15,8 +15,6 @@ async function getHtml({ minify = true }) {
         scriptsObj[$1] = readFileSync($1).toString()
     })
 
-    console.log(Object.entries(scriptsObj))
-
     let { code } = await terserMinify(scriptsObj, {
         compress: {
             global_defs: {
@@ -42,9 +40,10 @@ async function buildZip() {
     mkdirSync('/tmp/js13k/.build', { recursive: true })
     writeFileSync('/tmp/js13k/.build/index.html', html)
 
-    console.log(execSync(`zip build.zip .build/index.html`).toString())
-
+    console.log(execSync(`zip -9 build.zip /tmp/js13k/.build/index.html`).toString())
     console.log(execSync(`ls -alh build.zip`).toString())
+
+    execSync(`mv build.zip /tmp/js13k/.build/`)
 }
 
 switch (process.argv[2]) {

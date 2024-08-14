@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon --ignore game.js --ignore fullscreen.js --ignore music.js ./build.js serve",
     "start-compressed": "nodemon --ignore game.js --ignore fullscreen.js --ignore music.js ./build.js serve --compressed",
-    "build": "node ./build.js build"
+    "build": "node ./build.js build",
+    "deploy": "node ./build.js build && gh-pages -d /tmp/js13k/.build"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "compression": "^1.7.4",
     "express": "^4.19.2",
     "nodemon": "^3.1.4",
-    "terser": "^5.31.6"
+    "terser": "^5.31.6",
+    "gh-pages": "^2.1.1"
   }
 }
