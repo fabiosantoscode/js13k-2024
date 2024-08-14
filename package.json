@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon --ignore game.js --ignore fullscreen.js --ignore music.js ./build.js serve",
-    "start-compressed": "nodemon --ignore game.js --ignore fullscreen.js --ignore music.js ./build.js serve --compressed",
+    "start-compressed": "nodemon --ignore game.js --ignore player.js --ignore fullscreen.js --ignore music.js ./build.js serve --compressed",
     "build": "node ./build.js build",
     "deploy": "node ./build.js build && gh-pages -d /tmp/js13k/.build"
   },

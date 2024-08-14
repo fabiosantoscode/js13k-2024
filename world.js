@@ -21,7 +21,7 @@ let drawWorld = () => {
   let last_wall_top=0
 
   let distance_buffer = range(((canvasWidth + 20) / iter_step) | 0, () => {
-    let angle = lerp(player_ang-FOV, player_ang+FOV, x/canvasWidth)
+    let angle = lerp(-FOV, FOV, x/canvasWidth)
     let distance = map_collide_ray(player_x, player_y, angle)[2]
     let height = wallHeight(distance) || 0
     x += iter_step
@@ -80,10 +80,8 @@ let drawWorld = () => {
 
   // Draw the abyss
   if (x_start && x_end) {
-    ctx.globalAlpha = 0.4
-    ctx.fillStyle = 'black'
-    ctx.fillRect(abyss_x1, abyss_y1, x_end - x_start, abyss_h|0)
-    ctx.globalAlpha = 1
+    ctx.fillStyle = 'rgba(0,0,0,0.4)'
+    ctx.fillRect(abyss_x1, abyss_y1, x_end - x_start, (abyss_h|0) + 2)
   }
 
   for (let [x, distance, z_offset, height] of distance_buffer) {

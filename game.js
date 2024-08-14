@@ -1,7 +1,7 @@
 let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
 let MATH = Math;
-let {floor, ceil, sin, cos, abs, round, min, max} = MATH;
+let {floor, ceil, sin, cos, abs, round, min, max, random} = MATH;
 let { height: canvasHeight, width: canvasWidth } = c;
 let halfHeight = canvasHeight / 2
 let halfWidth = canvasWidth / 2
@@ -41,6 +41,10 @@ let makePromise = cb => new Promise(cb)
 let sleep = ms => makePromise(resolve => setTimeout(resolve, ms))
 let lerp = (from, to, much) => from + ((to - from) * much)
 let inv_lerp = (a, b, v) => (v - a) / (b - a)
+let remap = (fromMin, fromMax, toMin, toMax, v) => {
+  let f = inv_lerp(fromMin, fromMax, v)
+  return lerp(toMin, toMax, f)
+}
 let clamp = (a, b, v) => (v < a ? a : v > b ? b : v)
 let wrap_around = (start, end, value) => {
   if (value < start) return end + (value - start)
@@ -54,8 +58,8 @@ let map_collide_ray = (curX, curY, direction) => {
   let ix2
   let iy2
   let dist = .10
-  let dirX = cos(direction) * dist
-  let dirY = sin(direction) * dist
+  let dirX = sin(direction) * dist
+  let dirY = cos(direction) * dist
 
   let i = 1e4;
   while (i--) {
@@ -97,7 +101,7 @@ let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) =>
 let vec_length = (x, y) => MATH.sqrt(x**2, y**2)
 let vec_rotate = (x, y, ang) => [
   x * cos(ang) - y * sin(ang),
-  x * sin(ang) + y * cos(ang)
+  x * sin(ang) + y * cos(ang),
 ]
 
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION
@@ -112,16 +116,12 @@ let domLoadEvent = self.env === 'production' ? sleep() : makePromise(resolve => 
 
 // INPUT
 let keys = {}
-let setKey = (truth) => (e) => {
-    keys[e.key] = truth
-    resolveFirstHumanInteraction()
-}
+let setKey = (truth) => (e) => keys[e.key] = truth
 onkeydown = setKey(1)
 onkeyup = setKey()
 onclick = resolveFirstHumanInteraction
 
 let isKeyPressed = k => !!keys[k]
-
 
 let update = () => (
   updatePlayer()
@@ -129,7 +129,8 @@ let update = () => (
 
 let iter_step = 2
 let draw = () => (
-  drawWorld()
+  drawWorld(),
+  drawPlayer()
 )
 
 let doFrame = () => (
