@@ -1,11 +1,12 @@
-let audioCtx = new AudioContext();
+let audioCtx
 
 let drumTempo = (60_000 / (120 * 2)) / 2;
 
 // A register to avoid Terser writing 'let' sometimes
 let UNUSED_VAR;
 
-let DRUM_VOLUME_MOD = 0.075;
+let VOLUME_MOD = 1
+let DRUM_VOLUME_MOD = 0.04;
 
 let range = n => Array.from({ length: n })
 
@@ -109,14 +110,17 @@ a3x2 b3x2 c4x2 d4x2 e4x2 d4x2 g4x2 g3x2 a3x2 _ a3 _x4 ${response} _x4
 ${motif} ${motif}
 a4 g4 f4 e4 f4 e4 d4 c4 b3 a3 g3 a3 b3 c4 g3 _ a3x8 ${response} _x4`;
 let drumTab = `x _ o _ x _ o _ x _ o _ x x o _`
-playTabs([
-  [tabPlayer(instrument(0.3, 'square'), 2, 1, tab), 0],
-  [tabPlayer(instrument(0.3), 2, 2, tab), 34],
-  [tabPlayer(instrument(0.0, 'square'), 1, 1, drumTab), 34],
-])
+firstUserInteraction.then(() => {
+  audioCtx = new AudioContext();
+  playTabs([
+    [tabPlayer(instrument(0.3, 'square'), 2, 1, tab), 0],
+    [tabPlayer(instrument(0.3), 2, 2, tab), 34],
+    [tabPlayer(instrument(0.0, 'square'), 1, 1, drumTab), 34],
+  ])
+})
 */
 
-
+/*
 // mechanical turk cafe music
 let tab = ''
 + `_x2 _x2 d3x2 d3x2 e3x2 f3x2 d3x2 a3x6 d3x2 d3x2 e3x2 f3x2 d3x2 _x2 d3x4 d3x4 e3x2 f3x2 d3x2 a3x6 d3x2 e3x2 f3x2 d3x2 e3x2 _x2 `
@@ -129,15 +133,151 @@ let tab2 = ''
 + `_x48 a2x8 _ _ a2 _ a2 _ a2 _ `
 + `_x48 d3x8 _ _ d3 _ d3 _ d3 _`;
 let drumTab = `o o o x _ o o x _ o o x x _ x _`
-playTabs([
 
-  [tabPlayer(instrument(0.3, 'square'), 1, 1, tab), 34],
-  [tabPlayer(instrument(0.3), 1, 2, tab), 64],
-  [tabPlayer(instrument(0.1, 'sawtooth'), 1, 2, tab), 16],
 
-  [tabPlayer(instrument(0.15, 'sawtooth'), 1, 4, tab2), 34],
-  [tabPlayer(instrument(0.3), 1, 1, tab2), 64],
+firstUserInteraction.then(() => {
+  audioCtx = new AudioContext();
+  playTabs([
+    [tabPlayer(instrument(0.3, 'square'), 1, 1, tab), 34],
+    [tabPlayer(instrument(0.3), 1, 2, tab), 64],
+    [tabPlayer(instrument(0.1, 'sawtooth'), 1, 2, tab), 16],
+  
+    [tabPlayer(instrument(0.15, 'sawtooth'), 1, 4, tab2), 34],
+    [tabPlayer(instrument(0.3), 1, 1, tab2), 64],
+  
+    [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 36],
+  ])
+})
 
-  [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 36],
-])
+*/
 
+// Original game music
+drumTempo = (60_000 / (165 * 2)) / 2;
+
+let stopX3 = '_x24 '
+let stopX4 = stopX3 + '_x8 '
+
+let drum1 = 'o o x o o o x o '
+let drum2 = 'o o x o x o x o '
+let drumTab = ''
+// part 1
++ drum1
++ drum2
+// part 2
++ drum2
++ drum2
+
+let mainInstrumentPart1Motif = ''
++ 'e3x2 _x2 e3x2 d3x2 e3x2 _x2 e3x2 _x2 '
++ 'g3x2 _x2 g3x2 d3x2 g3x2 _x2 g3x2 _x2 '
+let mainInstrumentPart1Motif2 = ''
++ 'e4x2 _x2 e4x2 _x2 e4 _ g4 _ b4x2 _x2 '
+
+let mainInstrumentPart2Cadence = note => (note + ' _ ').repeat(7) + note + 'x2 '
+let mainInstrumentPart2Bit1 = mainInstrumentPart2Cadence('e4')
+let mainInstrumentPart2Bit2 = 'e3 _ e3 _ g3 _ a3 _ b3 _ b3 _ a3 _ g3x2 '
+let mainInstrumentPart2Motif = ''
++ mainInstrumentPart2Bit1
++ mainInstrumentPart2Cadence('d4')
+let mainInstrumentPart2Motif2 = ''
++ mainInstrumentPart2Bit1
++ mainInstrumentPart2Cadence('g4')
+let mainInstrumentPart2Response = ''
++ mainInstrumentPart2Bit2
++ mainInstrumentPart2Bit2
+let mainInstrumentPart2Response2 = ''
++ mainInstrumentPart2Bit2
++ mainInstrumentPart2Cadence('e3')
+let mainInstrumentPart2Finish = ''
++ mainInstrumentPart2Bit2
++ 'b3 _ a3 _ a3x2 _x2 b3 _ a3 _ d3x2 _x2 '
+let mainInstrumentTab = ''
+// part 1
++ mainInstrumentPart1Motif
++ mainInstrumentPart1Motif2
++ mainInstrumentPart1Motif2
++ mainInstrumentPart1Motif
++ mainInstrumentPart1Motif2
++ 'e4x2 _x2 e4x2 _x2 e4 _ d4 _ e4x2 _x2 '
+// part 2
++ mainInstrumentPart2Motif
++ mainInstrumentPart2Response
++ mainInstrumentPart2Motif
++ mainInstrumentPart2Response2
++ mainInstrumentPart2Motif2
++ mainInstrumentPart2Response
++ mainInstrumentPart2Motif
++ mainInstrumentPart2Finish
+
+let secondInstrumentBit = 'b3x2 _x2 b3x2 _x2 b3 _ d4 _ e4x2 _x2 '
+let secondInstrumentPhrase = ''
++ mainInstrumentPart2Cadence('b3')
++ mainInstrumentPart2Cadence('a3')
++ stopX4
+let secondInstrumentResponse = ''
++ mainInstrumentPart2Cadence('b3')
++ mainInstrumentPart2Cadence('d4')
++ stopX4
+let secondInstrumentTab = ''
+// part 1
++ stopX4
++ secondInstrumentBit
++ secondInstrumentBit
++ stopX4
++ secondInstrumentBit
++ 'b3x2 _x2 b3x2 _x2 b3 _ a3 _ b3x2 _x2 '
+// part 2
++ secondInstrumentPhrase
++ secondInstrumentPhrase
++ secondInstrumentResponse
++ secondInstrumentPhrase
+
+let highPitchedSlowStart = ''
++ 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
++ 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
+let highPitchedPart1A = ''
++ highPitchedSlowStart
++ 'b5x2 _x2 g5x2 _x2 e5x8 '
++ stopX3
+let highPitchedPart1B = ''
++ highPitchedSlowStart
++ 'b5x2 _x2 c6x2 _x2 e5x8 '
++ stopX3
+
+let highPitchedFastStart = ''
++ 'e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ '
+let highPitchedPart2A = ''
++ highPitchedFastStart
++ 'b5 _ b5 _ b5x4 '
++ stopX4
+let highPitchedPart2B = ''
++ highPitchedFastStart
++ 'b5 _ a5 _ b5x4 '
++ stopX4
+let highPitchedPart2C = ''
++ highPitchedFastStart
++ 'd6 _ e6 _ b5x4 '
++ stopX4
+let highPitchedTab = ''
++ highPitchedPart1A
++ highPitchedPart1B
++ highPitchedPart2A
++ highPitchedPart2B
++ highPitchedPart2C
++ highPitchedPart2A
+
+firstUserInteraction.then(() => {
+  audioCtx = new AudioContext();
+  playTabs([
+    [tabPlayer(instrument(0.3 * VOLUME_MOD, 'sawtooth'), 1, 1, mainInstrumentTab), 34],
+    [tabPlayer(instrument(0.3 * VOLUME_MOD), 1, 1, mainInstrumentTab), 16],
+
+    [tabPlayer(instrument(0.1 * VOLUME_MOD, ''), 1, 1, secondInstrumentTab), 16],
+
+    // High pitched backing track
+    [tabPlayer(instrument(0.125 * VOLUME_MOD, ''), 1, 1/2, highPitchedTab), 16],
+    [tabPlayer(instrument(0.3 * VOLUME_MOD), 1, 1, highPitchedTab), 16],
+
+    [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 0],
+  ])
+})

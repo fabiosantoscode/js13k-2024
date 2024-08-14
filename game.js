@@ -1,3 +1,5 @@
+let identity = x=>x
+let pipeFns = (f1, f2) => (...a) => f2(f1(...a))
 let {floor, ceil, sin, cos, abs, min, sqrt, round, PI} = Math;
 let { height: canvasHeight, width: canvasWidth } = c;
 let halfHeight = canvasHeight / 2
@@ -183,7 +185,7 @@ let update = () => {
 
     // jump
     let z_deviation = player_z - player_natural_z;
-    if (isKeyPressedThisFrame(' ') && frames_in_natural_z > 5) {
+    if (isKeyPressed(' ') && frames_in_natural_z > 5) {
       mov_z = 3
       frames_in_natural_z = 0
     } else {
@@ -309,17 +311,22 @@ let draw = () => {
   }
 }
 
+// START MUSIC AFTER INTERACTION
+let resolveFirstHumanInteraction
+let firstUserInteraction = new Promise((resolve) => {
+    resolveFirstHumanInteraction = resolve
+})
+
 // INPUT
 let keys = {}
-let lastFrameKeys = {}
-let setKey = truth => (e) => keys[e.key] = truth
-onkeydown = setKey(1)
-onkeyup = setKey()
-let rotateFrameKeys = () => {
-  lastFrameKeys = {...keys}
+let setKey = (truth) => (e) => {
+    keys[e.key] = truth
 }
+onkeydown = pipeFns(setKey(1), resolveFirstHumanInteraction)
+onkeyup = setKey()
+onclick = resolveFirstHumanInteraction
+
 let isKeyPressed = k => !!keys[k]
-let isKeyPressedThisFrame = k => isKeyPressed(k) && !lastFrameKeys[k]
 
 let start = () => {
   let doIt = () => (update(),draw(),setTimeout(doIt, UPDATES_PER_SECOND))
