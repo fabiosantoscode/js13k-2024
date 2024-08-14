@@ -23,11 +23,16 @@ let map = range(1000, _=>range(20, (_, i)=>i==0||i==19))
 let map_len_x = map[0].length
 let map_len_y = map.length
 
-// The player has no collision at the center of the track
+// The player has no collision while jumping and inside the track
 let player_should_collide = () =>
-  !(round(player_x) == round(map_len_x / 2) || player_iframes)
+  !(player_z > 2 && player_x > 2 && player_x < map_len_x - 2 || player_iframes)
 
-let map_collide_point = (x, y) => map[y][x];
+let map_collide_point = (x, y) => {
+  if (JUMP_DISTANCE > 0 && y === (JUMP_DISTANCE |0)) {
+    return true;
+  }
+  return map[y][x]
+};
 let makePromise = cb => new Promise(cb)
 let sleep = ms => makePromise(resolve => setTimeout(resolve, ms))
 let lerp = (from, to, much) => from + ((to - from) * much)

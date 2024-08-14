@@ -3,6 +3,7 @@ let game_position = 1
 
 /** There's a "turn" in the track */
 let CURRENT_TURN = 0
+let JUMP_DISTANCE = 0
 let target_turn = 0
 
 let yield_time = function*(ms) {
@@ -11,6 +12,7 @@ let yield_time = function*(ms) {
         yield;
     }
 }
+// CHALLENGES
 let hard_turn = function*() {
     // Turn left and right, try not to hit walls
     let turn_towards = random() > 0.5 ? 1 : -1
@@ -19,15 +21,29 @@ let hard_turn = function*() {
     yield* yield_time(5_000)
     target_turn = 0
 }
-let game_generator = function*() {
-    let challenges = [hard_turn]
-
-    for (let i = 0; i < 2; i++) {
-        let chl = challenges[floor(random() * challenges.length)]
-        yield * chl();
-        yield * yield_time(3_000); // normalcy time (decrease to increase difficulty)
+let jump = function*() {
+    // receive a wall in front of you to jump over
+    let start = Date.now()
+    yield* warn('JUMP')
+    JUMP_DISTANCE = player_y + RENDER_DIST + 2
+    while (player_y < JUMP_DISTANCE && (Date.now() - start < 4_000)) {
+        yield;
     }
 
+    JUMP_DISTANCE = 0;
+}
+let game_generator = function*() {
+    let challenges = [jump, hard_turn]
+
+    for (let i = 0; i < 2; i++) {
+        yield * yield_time(3_000); // normalcy time (decrease to increase difficulty)
+        while (abs(player_y - map_len_y) < 200) {
+            yield; // free normalcy because the map will wrap around and can break math
+        }
+        
+        let chl = challenges[floor(random() * challenges.length)]
+        yield * chl();
+    }
 }
 let warn = function*(w) {
     warning = w
@@ -56,5 +72,5 @@ let drawGoal = () => {
         sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow'
     ) : 'green'
 
-    ctx.fillText(warning || `${game_position}${th}`, 20, 20)
+    ctx.fillText(warning || `${game_position}${th} ${player_y}`, 20, 20)
 }
