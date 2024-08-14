@@ -24,14 +24,19 @@ let setValue = (thing, value) => {
 let instrument = (volume, waveShape) => {
   let oscillator = audioCtx.createOscillator();
   let gainNode = audioCtx.createGain();
+  let gainNode2 = audioCtx.createGain();
   let frequency = oscillator.frequency;
   let gain = gainNode.gain;
 
+  document.addEventListener("visibilitychange", () => {
+    // "visible" becomes true, becomes 1.0
+    setValue(gain, document.visibilityState > 'v');
+  });
   setValue(frequency, 0);
   setValue(gain, Math.log2(1 + 0.025 * volume));
   oscillator.type = waveShape;
   oscillator.start();
-  oscillator.connect(gainNode).connect(audioCtx.destination);
+  oscillator.connect(gainNode).connect(gainNode2).connect(audioCtx.destination);
   return [frequency, gain];
 };
 
@@ -276,6 +281,7 @@ firstUserInteraction.then(() => {
     [tabPlayer(instrument(0.125 * VOLUME_MOD, ''), 1, 1/2, highPitchedTab), 16],
     [tabPlayer(instrument(0.3 * VOLUME_MOD), 1, 1, highPitchedTab), 16],
 
+    // Drum
     [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 0],
   ])
 })

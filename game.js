@@ -13,22 +13,12 @@ let FORTY_FIVE_DEG_DIST = 0.707
 
 let UPDATES_PER_SECOND = 42 // ~1000/24
 let FOV = (1.5708 /* 90deg in radians */) / 2
+let CURRENT_FOV = (1.5708 /* 90deg in radians */) / 2
+let FOV_FAST = FOV + 0.8
 let RENDER_DIST = 40
 
 
-let map =
-`xx             x xx
-xx               xx
-xx            x  xx
-xx               xx
-xx               xx
-xx               xx
-xx               xx
-xx               xx
-xx               xx
-xx               xx
-xxx              xx
-`.repeat(10).trim().split('\n').map(xs => xs.split('').map(x => x === 'x'))
+let map = range(1000, _=>range(20, (_, i)=>i==0||i==19))
 let map_len_x = map[0].length
 let map_len_y = map.length
 
@@ -51,7 +41,12 @@ let wrap_around = (start, end, value) => {
   if (value > end) return start + (value - end)
   return value
 }
-
+let gradually_change = (value, inertia = 0.1) => {
+  return (newvalue) => {
+    value = value == null ? newvalue : lerp(value, newvalue, inertia)
+    return value
+  }
+}
 let map_collide_ray = (curX, curY, direction) => {
   let ix
   let iy
@@ -81,9 +76,8 @@ let map_collide_ray = (curX, curY, direction) => {
       break;
     }
 
-    if (map_collide_point(ix, iy) || map_collide_point(ix2, iy2)) {
-      return [curX, curY, dist]
-    }
+    if (map_collide_point(ix, iy))return[ix,iy,dist]
+    if (map_collide_point(ix2, iy2))return[ix2,iy2,dist]
   }
 
   return []
@@ -122,27 +116,38 @@ onkeyup = setKey()
 for (let button of document.all){
   let k = button.getAttribute('key')
   if (k) {
-    button.onpointerdown = () => keys[k] = 1
-    button.onpointerup = () => keys[k] = 0
+    button.onpointerdown = e => {
+      e.preventDefault()
+      keys[k] = 1
+      button.setPointerCapture(e.pointerId)
+    }
+    button.onpointerup = e => {
+      e.preventDefault()
+      keys[k] = 0
+      button.releasePointerCapture(e.pointerId)
+    }
   }
 }
 c.onclick = resolveFirstHumanInteraction
 
 let isKeyPressed = k => !!keys[k]
 
-let update = () => (
+let update = () => {
+  updateWorld()
   updatePlayer()
-)
+  updateGoal()
+}
 
 let iter_step = 2
-let draw = () => (
-  drawWorld(),
+let draw = () => {
+  drawWorld()
   drawPlayer()
-)
+  drawGoal()
+}
 
-let doFrame = () => (
-  update(),
-  draw(),
+let doFrame = () => {
+  update()
+  draw()
   setTimeout(doFrame, UPDATES_PER_SECOND)
-)
+}
 domLoadEvent.then(doFrame)

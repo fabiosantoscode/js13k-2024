@@ -1,17 +1,61 @@
-let drawWorld = () => {
-  let x = -10, y = -10, dist
-  // sky above, gray below
-  let z_center = (halfHeight  -  (-(canvasHeight * player_z) / RENDER_DIST))
-  while ((y+=4) < canvasHeight) {
-    dist = abs(y - z_center)
-    dist = inv_lerp(0, z_center, dist)
-    dist = lerp(.3, .6, dist)
-    dist *= 100
-    ctx.fillStyle = `hsl(88, ${dist}%, ${dist}%)`
-    ctx.fillRect(0, y, canvasWidth, 10)
-  }
+let prev_player_y
+let updateWorld = () => {
+  let third = (map_len_y / 3) | 0,i,x
+  let generate_invisible_part_of_the_map = when_over => {
+    // start RENDER_DIST ahead (so the player doesn't see)
+    // and then go on for 2/3 of the map.
+    let y = (when_over + RENDER_DIST + 30) % map_len_y
+    for (i = 0; i < third*2; i++) {
+      y = y + 1
+      if (y >= map_len_y) y = 0
 
-  let wallHeight = distance => (canvasHeight * 3.1) / distance
+      for (x=0;x<map_len_x;x++){map[y][x]=!(x>0&&x<map_len_x-1)}
+      for (x = 3; --x>0;) {
+        map[y][x] = random() > 0.85
+      }
+      map[y][4] = random() > 0.95
+      map[y][map_len_x-5] = random() > 0.95
+      for (x = map_len_x - 3; ++x<map_len_x;) {
+        map[y][x] = random() > 0.85
+      }
+    }
+  }
+  if (!prev_player_y) {
+    // generate first chunks
+    generate_invisible_part_of_the_map(third * 2)
+  } else {
+    for (let when_over of [third,third * 2,(third * 3)-4]) {
+      if (prev_player_y < when_over && player_y > when_over) {
+        generate_invisible_part_of_the_map(when_over)
+      }
+    }
+  }
+  prev_player_y = player_y
+}
+/** @returns {Array<[x, hit_x, hit_y, distance]>} */
+let get_distance_buffer = () => {
+  let x = 0
+  return range(((canvasWidth + 20) / iter_step) | 0, () => {
+    x += iter_step
+    let angle = lerp(-CURRENT_FOV, CURRENT_FOV, x/canvasWidth)
+    let [hit_x,hit_y,distance] = map_collide_ray(player_x, player_y, angle)
+
+    return [x, hit_x, hit_y, distance]
+  });
+}
+
+let drawWorld = () => {
+  // Change FOV according to speed
+  let target_fov =
+    clamp(FOV, FOV_FAST, remap(default_mov_y, player_speed, FOV, FOV_FAST, delayed_mov_y))
+  // (1-((1-clamp(0, 1, inv_lerp(default_mov_y, player_speed, delayed_mov_y))) ** 2)) * -.25
+  CURRENT_FOV = lerp(CURRENT_FOV, target_fov, 0.1)
+  let how_fast_are_we = inv_lerp(FOV, FOV_FAST, CURRENT_FOV)
+
+  // sky above, gray below
+  let z_center = (halfHeight - (-(canvasHeight * player_z) / RENDER_DIST))
+
+  let wallHeight = distance => (canvasHeight * 3.1 + 8.1 * (1+how_fast_are_we)) / distance
   let x_start = 0
   let x_end = 0
 
@@ -20,11 +64,8 @@ let drawWorld = () => {
   let first_wall_top=0
   let last_wall_top=0
 
-  let distance_buffer = range(((canvasWidth + 20) / iter_step) | 0, () => {
-    let angle = lerp(-FOV, FOV, x/canvasWidth)
-    let distance = map_collide_ray(player_x, player_y, angle)[2]
+  let distance_buffer = get_distance_buffer().map(([x, hit_x, hit_y, distance]) => {
     let height = wallHeight(distance) || 0
-    x += iter_step
 
     if (!distance || distance > RENDER_DIST) {
       if (x < halfWidth && !x_start) x_start = x + iter_step
@@ -44,7 +85,7 @@ let drawWorld = () => {
     first_wall_top ||= z_offset
     first_wall_bottom ||= z_offset + height
 
-    return [x, distance, z_offset, height]
+    return [x, hit_x, distance, z_offset, height]
   });
 
   let abyss_h = wallHeight(RENDER_DIST)
@@ -78,19 +119,25 @@ let drawWorld = () => {
   ctx.lineTo(0, (first_wall_bottom + first_wall_top) / 2);
   ctx.fill();
 
-  // Draw the abyss
-  if (x_start && x_end) {
-    ctx.fillStyle = 'rgba(255,255,255,0.1)'
-    ctx.fillRect(abyss_x1, abyss_y1, x_end - x_start, (abyss_h|0) + 2)
-  }
+  for (let [x, hit_x, distance, z_offset, height] of distance_buffer) {
+    let how_far = inv_lerp(RENDER_DIST, 0, distance)
+    how_far = clamp(0, 1, how_far)
 
-  for (let [x, distance, z_offset, height] of distance_buffer) {
-    let inv_distance = inv_lerp(0, RENDER_DIST, distance)
-
-    inv_distance = clamp(0, distance, inv_distance)
-    let col = lerp(255, 0, inv_distance)
-
-    ctx.fillStyle = `rgb(${col}, ${col}, ${col})`
+    ctx.fillStyle =
+      hit_x === 0 || hit_x === map_len_x - 1
+        ? `hsl(86deg, 90%, ${lerp(10,30,how_far)}%)`
+        : `hsl(44deg, 90%, ${lerp(10,30,how_far)}%)`
     ctx.fillRect(x, z_offset, 4, height)
   }
+  
+  // Draw the abyss
+  if (x_start && x_end) {
+    ctx.filter = 'blur(6px)'
+    ctx.fillStyle = 'rgba(255,200,200,.4)'
+    ctx.fillRect(abyss_x1_gradual(abyss_x1), abyss_y1, abyss_w_gradual(x_end - x_start), abyss_h_gradual((abyss_h|0) + 2))
+    ctx.filter = 'none'
+  }
 }
+let abyss_x1_gradual = gradually_change()
+let abyss_w_gradual = gradually_change()
+let abyss_h_gradual = gradually_change()

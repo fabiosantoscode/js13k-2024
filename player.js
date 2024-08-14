@@ -1,4 +1,4 @@
-let player_x = 5
+let player_x = 9
 let player_y = 5
 let player_z = 3
 let player_natural_z = 1
@@ -26,7 +26,7 @@ let updatePlayer = () => {
     let mov_z = 0
 
     if (isKeyPressed('w')) mov_y += 1
-    if (isKeyPressed('s')) mov_y -= 1
+    if (isKeyPressed('s')) mov_y -= .5
 
     if (isKeyPressed('a')) mov_x -= 1
     if (isKeyPressed('d')) mov_x += 1
@@ -247,7 +247,7 @@ let drawPlayer = () => {
   if (burn_intensity > 0.5) {
     ctx.fillStyle = 'yellow'
     ctx.globalAlpha = burn_intensity > 0.5
-      ? Math.sin(burning * 1.5) > (random() - 0.5)
+      ? sin(burning * 1.5) > (random() - 0.5)
       : (10 * burnNumber(burn_intensity + random())) ** 2
     ctx.beginPath()
     ctx.arc(...top, burnNumber(burn_intensity + random()) * 20, 0, TAU)
@@ -259,7 +259,7 @@ let drawPlayer = () => {
   ctx.fillStyle = 'orange'
 
   ctx.globalAlpha = burn_intensity > 0.5
-    ? Math.sin(burning * 1.5) > (random() - 0.5)
+    ? sin(burning * 1.5) > (random() - 0.5)
     : (10 * burn_intensity) ** 2
   ctx.beginPath()
   ctx.arc(...top, burnNumber(burn_intensity + random()) * 14, 0, TAU)
@@ -269,7 +269,57 @@ let drawPlayer = () => {
   top[1] -= 1
   ctx.fillStyle = prev_mov_y > default_mov_y ? 'red' : 'purple'
   ctx.globalAlpha = burnNumber(burn_intensity + random()) > 0.5
-    ? Math.sin(burning * 1.5) > (random() - 0.5)
+    ? sin(burning * 1.5) > (random() - 0.5)
+    : (10 * burnNumber(burn_intensity + random())) ** 2
+  ctx.beginPath()
+  ctx.arc(...top, burnNumber(burn_intensity + random()) * 10, 0, TAU)
+  ctx.fill()
+  ctx.globalAlpha = 1
+
+  // SMALLER BOTTOM BURNERS
+  burn_intensity *= .1
+
+  // BOTTOM LEFT BURNER
+  top[0] -= 10
+  top[1] += 8
+  top[1] += 1
+  ctx.fillStyle = 'orange'
+
+  ctx.globalAlpha = burn_intensity > 0.5
+    ? sin(burning * 1.5) > (random() - 0.5)
+    : (10 * burn_intensity) ** 2
+  ctx.beginPath()
+  ctx.arc(...top, burnNumber(burn_intensity + random()) * 14, 0, TAU)
+  ctx.fill()
+  ctx.globalAlpha = 1
+
+  top[1] -= 1
+  ctx.fillStyle = prev_mov_y > default_mov_y ? 'red' : 'purple'
+  ctx.globalAlpha = burnNumber(burn_intensity + random()) > 0.5
+    ? sin(burning * 1.5) > (random() - 0.5)
+    : (10 * burnNumber(burn_intensity + random())) ** 2
+  ctx.beginPath()
+  ctx.arc(...top, burnNumber(burn_intensity + random()) * 10, 0, TAU)
+  ctx.fill()
+  ctx.globalAlpha = 1
+
+  // BOTTOM RIGHT BURNER
+  top[0] += 20
+  top[1] += 1
+  ctx.fillStyle = 'orange'
+
+  ctx.globalAlpha = burn_intensity > 0.5
+    ? sin(burning * 1.5) > (random() - 0.5)
+    : (10 * burn_intensity) ** 2
+  ctx.beginPath()
+  ctx.arc(...top, burnNumber(burn_intensity + random()) * 14, 0, TAU)
+  ctx.fill()
+  ctx.globalAlpha = 1
+
+  top[1] -= 1
+  ctx.fillStyle = prev_mov_y > default_mov_y ? 'red' : 'purple'
+  ctx.globalAlpha = burnNumber(burn_intensity + random()) > 0.5
+    ? sin(burning * 1.5) > (random() - 0.5)
     : (10 * burnNumber(burn_intensity + random())) ** 2
   ctx.beginPath()
   ctx.arc(...top, burnNumber(burn_intensity + random()) * 10, 0, TAU)

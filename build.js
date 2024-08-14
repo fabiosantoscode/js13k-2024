@@ -41,6 +41,7 @@ async function buildZip() {
     writeFileSync('/tmp/js13k/.build/index.html', html)
 
     console.log(execSync(`zip -9 build.zip /tmp/js13k/.build/index.html`).toString())
+    console.log(execSync(`ls -al build.zip`).toString())
     console.log(execSync(`ls -alh build.zip`).toString())
 
     execSync(`mv build.zip /tmp/js13k/.build/`)
