@@ -25,19 +25,17 @@ let instrument = (volume, waveShape) => {
   let oscillator = audioCtx.createOscillator();
   let gainNode = audioCtx.createGain();
   let gainNode2 = audioCtx.createGain();
-  let frequency = oscillator.frequency;
-  let gain = gainNode.gain;
 
   document.addEventListener("visibilitychange", () => {
     // "visible" becomes true, becomes 1.0
-    setValue(gain, document.visibilityState > 'v');
+    setValue(gainNode2.gain, document.visibilityState > 'v');
   });
-  setValue(frequency, 0);
-  setValue(gain, Math.log2(1 + 0.025 * volume));
+  setValue(oscillator.frequency, 0);
+  setValue(gainNode.gain, Math.log2(1 + 0.025 * volume));
   oscillator.type = waveShape;
   oscillator.start();
   oscillator.connect(gainNode).connect(gainNode2).connect(audioCtx.destination);
-  return [frequency, gain];
+  return [oscillator.frequency, gainNode.gain];
 };
 
 let playTabs = async (tabs) => {
@@ -49,7 +47,7 @@ let playTabs = async (tabs) => {
   }
 }
 
-const drumWavePlan = async (plan, freqStart, freqEnd, frequency, gain, mod) => {
+let drumWavePlan = async (plan, freqStart, freqEnd, frequency, gain, mod) => {
   for (UNUSED_VAR of plan) {
     setValue(frequency, lerp(freqStart, freqEnd, UNUSED_VAR[0]) * mod)
     setValue(gain, (UNUSED_VAR[1] || UNUSED_VAR[0]) * DRUM_VOLUME_MOD)
@@ -57,7 +55,7 @@ const drumWavePlan = async (plan, freqStart, freqEnd, frequency, gain, mod) => {
   }
 }
 
-function* tabPlayer([frequency, gain], tempo, mod, tab) {
+let tabPlayer = function*([frequency, gain], tempo, mod, tab) {
   for (;;) for (UNUSED_VAR of trimSplit(tab)) {
     let [,note, octave, count = 1] = UNUSED_VAR.match(/^(\w#?|_)(\d?)x?(\d+)?$/)
     if (note === 'x') {

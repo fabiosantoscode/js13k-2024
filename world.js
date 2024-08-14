@@ -32,22 +32,66 @@ let updateWorld = () => {
   }
   prev_player_y = player_y
 }
+
+let map_collide_ray = (curX, curY, direction) => {
+  let ix
+  let iy
+  let ix2
+  let iy2
+  let dist = .10
+  let dirX = sin(direction) * dist
+  let dirY = cos(direction) * dist
+
+  let i = 1e4;
+  while (i--) {
+    dist += .10
+
+    if (dist > RENDER_DIST) break;
+
+    curX += dirX
+    curY += dirY
+
+    curX = wrap_around(0, map_len_x - 1, curX)
+    curY = wrap_around(0, map_len_y - 1, curY)
+
+    ix = floor(curX)
+    iy = floor(curY)
+    ix2 = ceil(curX)
+    iy2 = ceil(curY)
+
+    if (ix2 >= map_len_x || iy2 >= map_len_y || ix < 0 || iy < 0) {
+      break;
+    }
+
+    if (map_collide_point(ix, iy))return[ix,iy,dist]
+    if (map_collide_point(ix2, iy2))return[ix2,iy2,dist]
+  }
+
+  return []
+}
+
 /** @returns {Array<[x, hit_x, hit_y, distance]>} */
 let get_distance_buffer = () => {
   let x = 0
   return range(((canvasWidth + 20) / iter_step) | 0, () => {
     x += iter_step
-    let angle = lerp(-CURRENT_FOV, CURRENT_FOV, x/canvasWidth)
-    let [hit_x,hit_y,distance] = map_collide_ray(player_x, player_y, angle)
+    let turn = CURRENT_TURN * .3
+    let spread = -abs(CURRENT_TURN * .05)
+    let angle = lerp(-CURRENT_FOV - turn - spread, CURRENT_FOV - turn + spread, x/canvasWidth)
+    let [hit_x, hit_y, distance] = map_collide_ray(player_x, player_y, angle)
 
     return [x, hit_x, hit_y, distance]
   });
 }
 
+let abyss_x1_gradual = gradually_change()
+let abyss_w_gradual = gradually_change()
 let drawWorld = () => {
   // Change FOV according to speed
   let target_fov =
-    clamp(FOV, FOV_FAST, remap(default_mov_y, player_speed, FOV, FOV_FAST, delayed_mov_y))
+    CURRENT_TURN != 0
+      ? FOV
+      : clamp(FOV, FOV_FAST, remap(default_mov_y, player_speed, FOV, FOV_FAST, delayed_mov_y))
   // (1-((1-clamp(0, 1, inv_lerp(default_mov_y, player_speed, delayed_mov_y))) ** 2)) * -.25
   CURRENT_FOV = lerp(CURRENT_FOV, target_fov, 0.1)
   let how_fast_are_we = inv_lerp(FOV, FOV_FAST, CURRENT_FOV)
@@ -56,8 +100,6 @@ let drawWorld = () => {
   let z_center = (halfHeight - (-(canvasHeight * player_z) / RENDER_DIST))
 
   let wallHeight = distance => (canvasHeight * 3.1 + 8.1 * (1+how_fast_are_we)) / distance
-  let x_start = 0
-  let x_end = 0
 
   let first_wall_bottom=0
   let last_wall_bottom=0
@@ -66,11 +108,6 @@ let drawWorld = () => {
 
   let distance_buffer = get_distance_buffer().map(([x, hit_x, hit_y, distance]) => {
     let height = wallHeight(distance) || 0
-
-    if (!distance || distance > RENDER_DIST) {
-      if (x < halfWidth && !x_start) x_start = x + iter_step
-      if (x > halfWidth) x_end = x + iter_step
-    }
   
     // bend light so the game looks cooler
     for (let incr = 0.05; incr < 2; incr+=0.05) {
@@ -87,6 +124,23 @@ let drawWorld = () => {
 
     return [x, hit_x, distance, z_offset, height]
   });
+
+  let x_start
+  let x_end
+  let latch
+  distance_buffer.map(([x, hit_x, distance]) => {
+    if (!distance || distance > RENDER_DIST) {
+      if (x_start == null) {
+        x_start = x
+        latch = true
+      }
+    } else if (latch === true) {
+      latch = false
+      x_end = x
+    }
+  });
+  x_start ||= 0
+  x_end ||= 0
 
   let abyss_h = wallHeight(RENDER_DIST)
   let abyss_x1 = x_start
@@ -131,13 +185,8 @@ let drawWorld = () => {
   }
   
   // Draw the abyss
-  if (x_start && x_end) {
-    ctx.filter = 'blur(6px)'
-    ctx.fillStyle = 'rgba(255,200,200,.4)'
-    ctx.fillRect(abyss_x1_gradual(abyss_x1), abyss_y1, abyss_w_gradual(x_end - x_start), abyss_h_gradual((abyss_h|0) + 2))
-    ctx.filter = 'none'
-  }
+  ctx.filter = 'blur(10px)'
+  ctx.fillStyle = 'rgba(255,200,200,.4)'
+  ctx.fillRect(abyss_x1_gradual(abyss_x1) - 5, abyss_y1 - 5, abyss_w_gradual(x_end - x_start) + 5, (abyss_h|0) + 10)
+  ctx.filter = 'none'
 }
-let abyss_x1_gradual = gradually_change()
-let abyss_w_gradual = gradually_change()
-let abyss_h_gradual = gradually_change()
