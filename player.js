@@ -73,7 +73,7 @@ let updatePlayer = () => {
   prev_mov_z = mov_z
 
   let sideways_force_from_turns = sideways_force_from_turns_gradual(CURRENT_TURN * .5)
-  mov_x -= sideways_force_from_turns
+  mov_x -= sideways_force_from_turns * prev_mov_y
 
   // try new position to see how we feel
   mov_x = (mov_x * player_speed) + player_x
@@ -157,14 +157,21 @@ let drawPlayer = () => {
   botRight[1] += t * 5
 
   // Wiggle as we move X
-  tip[0] += prev_mov_x * 10
+  tip[0] += prev_mov_x * 32
   tip[1] += abs(prev_mov_x) * 7
-  top[0] -= prev_mov_x * 5
-  top[1] -= abs(prev_mov_x) * 3
-  botLeft[1] -= abs(prev_mov_x) * 4
-  botRight[1] -= abs(prev_mov_x) * 4
-  botLeft[0] += abs(prev_mov_x) * 8
-  botRight[0] -= abs(prev_mov_x) * 8
+  top[0] -= prev_mov_x * 5 * 2
+  top[1] -= abs(prev_mov_x) * 5
+  if (prev_mov_x < 0) {
+    // when turning left
+    botLeft[0] -= prev_mov_x * 25
+    botRight[1] += prev_mov_x * 25
+    botLeft[1] -= prev_mov_x * 25
+  }
+  if (prev_mov_x > 0) {
+    botRight[0] -= prev_mov_x * 25
+    botLeft[1] -= prev_mov_x * 25
+    botRight[1] += prev_mov_x * 25
+  }
 
   // Lower tip as we move faster
   tip[1] += (prev_mov_y - default_mov_y) * 5
@@ -199,14 +206,16 @@ let drawPlayer = () => {
   }
 
   // Cast a shadow
-  ctx.fillStyle = 'rgba(44,0,44,0.44)'
+  ctx.fillStyle = 'rgba(44,0,44,0.8)'
+  ctx.filter = `blur(${1}px)`
   ctx.globalAlpha = gradual_shadow_alpha(+(player_z < 3))
   ctx.beginPath()
-  ctx.moveTo(tip[0], lerp(tip[1], canvasHeight, 0.8))
-  ctx.lineTo(botLeft[0], lerp(botLeft[1], canvasHeight, 0.8))
-  ctx.lineTo(botRight[0], lerp(botRight[1], canvasHeight, 0.8))
-  ctx.lineTo(tip[0], lerp(tip[1], canvasHeight, 0.8))
+  ctx.moveTo(tip[0], lerp(tip[1], canvasHeight, 0.8) - 20)
+  ctx.lineTo(botLeft[0], lerp(botLeft[1], canvasHeight, 0.8) + 3)
+  ctx.lineTo(botRight[0], lerp(botRight[1], canvasHeight, 0.8) + 3)
+  ctx.lineTo(tip[0], lerp(tip[1], canvasHeight, 0.8) - 20)
   ctx.fill()
+  ctx.filter = `none`
   ctx.globalAlpha = 1
 
   let drawTriangle = (color, lineColor, a, b, c) => {
