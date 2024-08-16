@@ -110,7 +110,7 @@ let updatePlayer = () => {
       let end = Date.now() + 500
       while (Date.now() < end) {
         player_x = lerp(player_x, map_len_x / 2, 0.3)
-        await sleep(UPDATES_PER_SECOND)
+        await sleep(FRAME_DELTA_MS)
       }
       should_update_player++
       player_iframes--

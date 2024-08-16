@@ -8,7 +8,7 @@ let APPROACHING_RACER
 
 
 let ordinal = place => {
-    let nx = ['th','st¤','nd','rd']
+    let nx = ['th','st','nd','rd']
     return place+(nx[place] || nx[0])
 }
 let round_n = (num, n) => Math.round(num / n) * n
@@ -103,16 +103,13 @@ let updateGoal = () => {
 }
 let debug_info = () => {
     if (self.env === 'production') return ''
-    return `${player_y}`
+    return ` ${player_y}`
 }
 let warning = ''
 let drawGoal = () => {
-    ctx.font = '20px sans-serif'
-    ctx.font = "20px 'Comic Sans MS'"
-
     ctx.fillStyle = warning ? (
         sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow'
     ) : 'green'
 
-    ctx.fillText(warning || `${ordinal(goal_nth_place)} ${debug_info()}`, 20, 20)
+    ctx.fillText(warning || ordinal(goal_nth_place) + debug_info(), halfWidth, 20)
 }

@@ -8,7 +8,9 @@ async function getHtml({ minify = true }) {
     let html = readFileSync('index.html').toString()
     if (!minify) return html
 
-    const [htmlBody, scripts] = html.split(/<!--\s*snip\s*-->/i)
+    const [htmlBodyAndStory, scripts] = html.split(/<!--\s*snip\s*-->/i)
+    const htmlBody = htmlBodyAndStory
+        .replace(/<!--\s*story\s*-->/i, readFileSync('story.html').toString())
 
     const scriptsObj = {}
     scripts.replace(/"(.+?\.js)"/g, (_, $1) => {

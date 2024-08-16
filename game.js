@@ -12,7 +12,7 @@ let ctx = c.getContext('2d')
 let TAU = MATH.PI * 2
 let FORTY_FIVE_DEG_DIST = 0.6
 
-let UPDATES_PER_SECOND = 42 // ~1000/24
+let FRAME_DELTA_MS = 42 // ~1000/24
 let FOV = .8 // (1.5708 /* 90deg in radians */) / 2
 let CURRENT_FOV = FOV
 let FOV_FAST = FOV * 2
@@ -73,16 +73,6 @@ let vec_rotate = (x, y, ang) => [
   x * sin(ang) + y * cos(ang),
 ]
 
-// MUSIC, FULLSCREEN, ETC, NEED INTERACTION
-let resolveFirstHumanInteraction
-let firstUserInteraction = makePromise((resolve) => {
-    resolveFirstHumanInteraction = resolve
-})
-// START FRAMING (in minified mode, just sleep 1 frame)
-let domLoadEvent = self.env === 'production' ? sleep() : makePromise(resolve => {
-  onload = resolve
-});
-
 // INPUT
 let keys = {}
 let setKey = (truth) => (e) => keys[e.key] = truth
@@ -103,7 +93,6 @@ for (let button of document.all){
     }
   }
 }
-c.onclick = resolveFirstHumanInteraction
 
 let isKeyPressed = k => !!keys[k]
 
@@ -130,6 +119,25 @@ let draw = () => {
 let doFrame = () => {
   update()
   draw()
-  setTimeout(doFrame, UPDATES_PER_SECOND)
+  setTimeout(doFrame, FRAME_DELTA_MS)
 }
-domLoadEvent.then(doFrame)
+
+// MUSIC, FULLSCREEN, ETC, NEED INTERACTION
+let firstUserInteraction = makePromise((resolve) => {
+    c.onclick = resolve
+})
+
+ctx.font = '20px sans-serif'
+ctx.font = "20px 'Comic Sans MS'"
+ctx.textAlign = 'center'
+
+// START FRAMING (in minified mode, just sleep 1 frame).
+if (self.env === 'production') {
+  firstUserInteraction.then(doFrame)
+  ctx.fillStyle = 'purple'
+  ctx.fillText('CLICK TO START', halfWidth, halfHeight)
+} else {
+  onload = () => {
+    doFrame()
+  }
+}

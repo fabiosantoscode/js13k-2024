@@ -1,5 +1,6 @@
 if (self.env === 'production') {
     firstUserInteraction.then(() => {
-        document.body.requestFullscreen?.().catch(identity)
+        // "sc" is the ID of the div that contains the canvas and our controller
+        sc.requestFullscreen?.().catch(identity)
     })
 }
