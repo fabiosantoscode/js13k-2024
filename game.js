@@ -2,35 +2,33 @@ let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
 let MATH = Math;
 let {floor, ceil, sin, cos, abs, round, min, max, random} = MATH;
-let { height: canvasHeight, width: canvasWidth } = c;
+let canvasHeight = 180
+let canvasWidth = 320
 let halfHeight = canvasHeight / 2
 let halfWidth = canvasWidth / 2
 /** @type {CanvasRenderingContext2D} */
 let ctx = c.getContext('2d')
 
 let TAU = MATH.PI * 2
-let FORTY_FIVE_DEG_DIST = 0.707
+let FORTY_FIVE_DEG_DIST = 0.6
 
 let UPDATES_PER_SECOND = 42 // ~1000/24
-let FOV = (1.5708 /* 90deg in radians */) / 2
-let CURRENT_FOV = (1.5708 /* 90deg in radians */) / 2
-let FOV_FAST = FOV + 0.8
+let FOV = .8 // (1.5708 /* 90deg in radians */) / 2
+let CURRENT_FOV = FOV
+let FOV_FAST = FOV * 2
 let RENDER_DIST = 40
 let GAME_TIME = 0.1
 
 
-let map = range(1000, _=>range(20, (_, i)=>i==0||i==19))
-let map_len_x = map[0].length
-let map_len_y = map.length
+let map_len_x = 20
+let map_len_y = 1000
+let map = range(map_len_y, _=>range(map_len_x, (_, i)=>i==0||i==19))
 
 // The player has no collision while jumping and inside the track
 let player_should_collide = () =>
   !(player_z > 2 && player_x > 2 && player_x < map_len_x - 2 || player_iframes)
 
 let map_collide_point = (x, y) => {
-  if (JUMP_DISTANCE > 0 && y === (JUMP_DISTANCE |0)) {
-    return true;
-  }
   return map[y][x]
 };
 let makePromise = cb => new Promise(cb)
@@ -115,13 +113,16 @@ let update = () => {
   game_start_time||=Date.now()
   GAME_TIME = Date.now() - game_start_time
   updateWorld()
+  updateApproachingRacer()
   updatePlayer()
   updateGoal()
 }
 
 let iter_step = 2
 let draw = () => {
+  ctx.lineJoin = 'round'
   drawWorld()
+  drawApproachingRacer()
   drawPlayer()
   drawGoal()
 }

@@ -38,16 +38,12 @@ let map_collide_ray = (curX, curY, direction) => {
   let iy
   let ix2
   let iy2
-  let dist = .10
-  let dirX = sin(direction) * dist
-  let dirY = cos(direction) * dist
+  let step = .1
+  let dist = step
+  let dirX = sin(direction) * step
+  let dirY = cos(direction) * step
 
-  let i = 1e4;
-  while (i--) {
-    dist += .10
-
-    if (dist > RENDER_DIST) break;
-
+  for (; dist < RENDER_DIST; dist += step) {
     curX += dirX
     curY += dirY
 
@@ -63,12 +59,16 @@ let map_collide_ray = (curX, curY, direction) => {
       break;
     }
 
-    if (map_collide_point(ix, iy))return[ix,iy,dist]
-    if (map_collide_point(ix2, iy2))return[ix2,iy2,dist]
+    if (map_collide_point(ix, iy)) return [ix,iy,dist]
+    if (map_collide_point(ix2, iy2)) return [ix2,iy2,dist]
   }
 
   return []
 }
+
+// sky above, gray below
+let screen_y_of_horizon = () => (halfHeight - (-(canvasHeight * player_z) / RENDER_DIST)) | 0
+let screen_y_at_distance = distance => (halfHeight - (-(canvasHeight * player_z) / distance)) | 0
 
 /** @returns {Array<[x, hit_x, hit_y, distance]>} */
 let get_distance_buffer = () => {
@@ -187,6 +187,11 @@ let drawWorld = () => {
   // Draw the abyss
   ctx.filter = 'blur(10px)'
   ctx.fillStyle = 'rgba(255,200,200,.4)'
-  ctx.fillRect(abyss_x1_gradual(abyss_x1) - 5, abyss_y1 - 5, abyss_w_gradual(x_end - x_start) + 5, (abyss_h|0) + 10)
+  ctx.fillRect(
+    abyss_x1_gradual(abyss_x1) - 5, 
+    abyss_y1 - 5, 
+    abyss_w_gradual(x_end - x_start) + 10, 
+    (abyss_h|0) + 10
+  )
   ctx.filter = 'none'
 }

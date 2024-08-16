@@ -19,13 +19,18 @@ async function getHtml({ minify = true }) {
         compress: {
             global_defs: {
                 'self.env': 'production'
-            }
+            },
+            // unsafe: true, // at the end
+            passes: 5,
+            pure_new: true,
+            pure_getters: true,
         },
         mangle: true,
         toplevel: true,
         format: {
             ascii_only: true,
             safari10: true,
+            wrap_func_args: false,
         }
     })
 

@@ -6,12 +6,11 @@ canvas{x-image-rendering:-moz-crisp-edges;image-rendering:pixelated;width:100%;h
 *{padding:0;margin:0;user-select:none;}
 html,body,.sc{height:100%;overflow:hidden;background:black;line-height:1;}
 .sc{display:flex;justify-content: center; align-items: center;}
-button,x-hole{width: 30%;height:35px;border: none;background: white;display: inline-block;padding: 0;margin: 0;min-width: 0;}
-x-hole{opacity:0;}
+button{width:30%;height:35px;border:none;background:white;display:inline-block;padding:1em;min-width:0;}
 [keys]{position:fixed;bottom:50px;width:20vw;min-width:300px}
 [left]{text-align:left;left:50px;}
 [right]{text-align:right;right:50px;}
-@media (max-width: 600px){button,x-hole{width: 50px;}}
+@media (max-width: 600px){button{width: 50px;}}
 @media (min-aspect-ratio: 320/180){canvas{height: 100%;width: auto;justify-self: center;}}
 </style>
 <div class=sc>
@@ -26,6 +25,7 @@ x-hole{opacity:0;}
 <script src="game.js"></script>
 <script src="world.js"></script>
 <script src="player.js"></script>
+<script src="approaching-racer.js"></script>
 <script src="music.js"></script>
 <script src="fullscreen.js"></script>
 <script src="goal.js"></script>

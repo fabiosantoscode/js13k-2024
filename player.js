@@ -129,29 +129,81 @@ let shaking_intensity_period = 0
 let gradual_shadow_alpha = gradually_change(1, 0.8)
 let gradual_current_turn = gradually_change(0)
 
-let drawPlayer = () => {
-  // shake our guy with a sin()
-  shaking = shaking += 8
-  shaking_intensity_period += 0.1
-  hovering += abs(abs(prev_mov_y) - abs(prev_mov_x)) * 0.1
-  // burn intensity is 2 components, one is how much harder we're accelerating, and the other is how much we're accelerating in general
-  let burn_intensity = clamp(0, 10, 
-    (clamp(0, 1, prev_mov_y - default_mov_y) * 4)
-    + (clamp(0, 1, prev_mov_y - delayed_mov_y) * 6)
-  ) / 10 // 0..=1
-  burning += burn_intensity
+let draw_hull = ([tip, botLeft, botRight, top], color_left, color_right, color_highlight, lineWidth) => {
+  let drawTriangle = (color, lineColor, a, b, c) => {
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.moveTo(...a)
+    ctx.lineTo(...b)
+    ctx.lineTo(...c)
+    ctx.lineTo(...a)
+    ctx.fill()
 
-  // for sfx
-  delayed_mov_x = lerp(delayed_mov_x, prev_mov_x, 0.1)
-  delayed_mov_y = lerp(delayed_mov_y, prev_mov_y, 0.1)
-  delayed_mov_z = lerp(delayed_mov_z, prev_mov_z, 0.1)
+    ctx.lineWidth = lineWidth
+    ctx.strokeStyle = lineColor
+    ctx.beginPath()
+    ctx.moveTo(...a)
+    ctx.lineTo(...b)
+    ctx.lineTo(...c)
+    ctx.lineTo(...a)
+    ctx.stroke()
+    ctx.lineWidth = 1
+  }
 
-  let tip = [halfWidth + 1, (canvasHeight - 30) - 15]
-  let botLeft = [halfWidth - 30, (canvasHeight - 30) + 20]
-  let botRight = [halfWidth + 30, (canvasHeight - 30) + 20]
-  let top = [halfWidth - 1, (canvasHeight - 32)]
+  // right triangle is facing us, draw it in front
+  if (top[0] < tip[0]) {
+    // left
+    drawTriangle(color_left, color_highlight, tip, top, botLeft)
 
-  let t = gradual_current_turn(CURRENT_TURN)
+    // right
+    drawTriangle(color_right, color_highlight, tip, top, botRight)
+  } else {
+    // right
+    drawTriangle(color_right, color_highlight, tip, top, botRight)
+
+    // left
+    drawTriangle(color_left, color_highlight, tip, top, botLeft)
+  }
+
+  // back
+  drawTriangle('black', 'brown', top, botLeft, botRight)
+}
+
+let shrink_hull = (hull_coords, scale) => {
+  let midpoint_x=0, midpoint_y=0;
+
+  hull_coords.forEach(([x, y]) => {
+    midpoint_x += x
+    midpoint_y += y
+  })
+
+  midpoint_x /= hull_coords.length
+  midpoint_y /= hull_coords.length
+
+  hull_coords.forEach((cx) => {
+    let at_origin = cx[0] - midpoint_x;
+    at_origin *= scale
+    cx[0] = midpoint_x + at_origin;
+    at_origin = cx[1] - midpoint_y;
+    at_origin *= scale
+    cx[1] = midpoint_y + at_origin;
+  })
+}
+
+let move_hull = (hull_coords, move_x, move_y) => {
+  return hull_coords.forEach((cx) => {
+    cx[0] = (cx[0] + move_x) | 0
+    return cx[1] = (cx[1] + move_y) | 0
+  })
+}
+
+let create_hull = (center_x, center_y, prev_mov_x, global_turn) => {
+  let tip = [center_x + 1, center_y - 15]
+  let botLeft = [center_x - 30, center_y + 20]
+  let botRight = [center_x + 30, center_y + 20]
+  let top = [center_x - 1, center_y - 2]
+
+  let t = global_turn
   tip[0] += t * 20
   botLeft[1] -= t * 5
   botRight[1] += t * 5
@@ -173,6 +225,29 @@ let drawPlayer = () => {
     botRight[1] += prev_mov_x * 25
   }
 
+  return [tip, botLeft, botRight, top]
+}
+
+let drawPlayer = () => {
+  // shake our guy with a sin()
+  shaking = shaking += 8
+  shaking_intensity_period += 0.1
+  hovering += abs(abs(prev_mov_y) - abs(prev_mov_x)) * 0.1
+  // burn intensity is 2 components, one is how much harder we're accelerating, and the other is how much we're accelerating in general
+  let burn_intensity = clamp(0, 10, 
+    (clamp(0, 1, prev_mov_y - default_mov_y) * 4)
+    + (clamp(0, 1, prev_mov_y - delayed_mov_y) * 6)
+  ) / 10 // 0..=1
+  burning += burn_intensity
+
+  let HULL = create_hull(halfWidth, canvasHeight - 30, prev_mov_x, gradual_current_turn(CURRENT_TURN))
+  let [tip, botLeft, botRight, top] = HULL
+
+  // for sfx
+  delayed_mov_x = lerp(delayed_mov_x, prev_mov_x, 0.1)
+  delayed_mov_y = lerp(delayed_mov_y, prev_mov_y, 0.1)
+  delayed_mov_z = lerp(delayed_mov_z, prev_mov_z, 0.1)
+
   // Lower tip as we move faster
   tip[1] += (prev_mov_y - default_mov_y) * 5
   // Buttclench as we move faster
@@ -192,7 +267,7 @@ let drawPlayer = () => {
   botRight[1] += prev_mov_z * 4
 
   // Lower us when moving X, raise us when moving Y
-  for (let coords of [tip, botLeft, botRight, top]) {
+  for (let coords of HULL) {
     let vertical_offset = -(abs(delayed_mov_x) * 2) + (((delayed_mov_y - default_mov_y)) * 9)
     coords[1] += vertical_offset
     // Periodic hovering, but only if offset isn't too harsh
@@ -207,53 +282,29 @@ let drawPlayer = () => {
 
   // Cast a shadow
   ctx.fillStyle = 'rgba(44,0,44,0.8)'
-  ctx.filter = `blur(${1}px)`
-  ctx.globalAlpha = gradual_shadow_alpha(+(player_z < 3))
+  ctx.filter = `blur(${4}px)`
+  ctx.globalAlpha = gradual_shadow_alpha(+(player_z < 2))
   ctx.beginPath()
-  ctx.moveTo(tip[0], lerp(tip[1], canvasHeight, 0.8) - 20)
+  ctx.moveTo(tip[0], lerp(tip[1], canvasHeight, 0.8) - 10)
   ctx.lineTo(botLeft[0], lerp(botLeft[1], canvasHeight, 0.8) + 3)
   ctx.lineTo(botRight[0], lerp(botRight[1], canvasHeight, 0.8) + 3)
-  ctx.lineTo(tip[0], lerp(tip[1], canvasHeight, 0.8) - 20)
   ctx.fill()
   ctx.filter = `none`
   ctx.globalAlpha = 1
 
-  let drawTriangle = (color, lineColor, a, b, c) => {
-    ctx.fillStyle = color
-    ctx.beginPath()
-    ctx.moveTo(...a)
-    ctx.lineTo(...b)
-    ctx.lineTo(...c)
-    ctx.lineTo(...a)
-    ctx.fill()
-    ctx.strokeStyle = lineColor
-    ctx.beginPath()
-    ctx.moveTo(...a)
-    ctx.lineTo(...b)
-    ctx.lineTo(...c)
-    ctx.lineTo(...a)
-    ctx.stroke()
-  }
+  move_hull(HULL, (canvasWidth / 20) * current_turn_gradual(CURRENT_TURN), abs(current_turn_gradual(CURRENT_TURN)) * -2)
+  draw_hull(HULL, 'green', 'gray', 'purple', 1.5)
 
-  // right triangle is facing us, draw it in front
-  if (top[0] < tip[0]) {
-    // left
-    drawTriangle('green', 'purple', tip, top, botLeft)
+  draw_hull_burninators(HULL, false, 1, burn_intensity)
+}
 
-    // right
-    drawTriangle('gray', 'purple', tip, top, botRight)
-  } else {
-    // right
-    drawTriangle('gray', 'purple', tip, top, botRight)
+let current_turn_gradual = gradually_change(0, 0.01)
 
-    // left
-    drawTriangle('green', 'purple', tip, top, botLeft)
-  }
-
-  // back
-  drawTriangle('black', 'brown', top, botLeft, botRight)
-
-  top[1] += 11
+// Draws the burninators. Destroys hull data
+let draw_hull_burninators = ([tip, botLeft, botRight, top], just_one, scale, burn_intensity) => {
+  // Go a third of the hull's height down
+  let bottom_y = (botLeft[1] + botRight[1]) / 2
+  top[1] += abs(top[1] - bottom_y) / 2
 
   let burnNumber = f => {
     for (let i = 0.1; i < 1; i+=0.1) if (f > i) f *= 1.1
@@ -268,12 +319,12 @@ let drawPlayer = () => {
         ? sin(burning * 1.5) > (random() - 0.5)
         : (10 * burnNumber(burn_intensity + random())) ** 2
       ctx.beginPath()
-      ctx.arc(...top, burnNumber(burn_intensity + random()) * 20, 0, TAU)
+      ctx.arc(...top, burnNumber(burn_intensity + random()) * 20 * scale, 0, TAU)
       ctx.fill()
 
       ctx.globalAlpha *= 0.6
       ctx.filter = 'blur(15px)'
-      ctx.fillRect(top[0] - 20, top[1] - 10, 40, 20 + 20 * burnNumber(burn_intensity))
+      ctx.fillRect(top[0] - 20, top[1] - 10, 40 * scale, 20 + 20 * burnNumber(burn_intensity) * scale)
       ctx.filter = 'none'
       ctx.globalAlpha = 1
     }
@@ -285,7 +336,7 @@ let drawPlayer = () => {
       ? sin(burning * 1.5) > (random() - 0.5)
       : (10 * burn_intensity) ** 2
     ctx.beginPath()
-    ctx.arc(...top, burnNumber(burn_intensity + random()) * 14, 0, TAU)
+    ctx.arc(...top, burnNumber(burn_intensity + random()) * 14 * scale, 0, TAU)
     ctx.fill()
     ctx.globalAlpha = 1
 
@@ -296,16 +347,18 @@ let drawPlayer = () => {
       ? sin(burning * 1.5) > (random() - 0.5)
       : (10 * burnNumber(burn_intensity + random())) ** 2
     ctx.beginPath()
-    ctx.arc(...top, burnNumber(burn_intensity + random()) * 10, 0, TAU)
+    ctx.arc(...top, burnNumber(burn_intensity + random()) * 10 * scale, 0, TAU)
     ctx.fill()
     ctx.globalAlpha = 1
   }
 
   drawBurninator(true)
 
+  if (just_one) return
+
   // SMALLER BOTTOM BURNERS
   burn_intensity *= .1
-  top[1] += 10
+  top[1] += 10 * scale
   let center = [...top]
 
   // BOTTOM LEFT BURNER
