@@ -17,7 +17,8 @@ let FOV = .8 // (1.5708 /* 90deg in radians */) / 2
 let CURRENT_FOV = FOV
 let FOV_FAST = FOV * 2
 let RENDER_DIST = 40
-let GAME_TIME = 0.1
+let GAME_TIME = 0.1 // TODO remove this, use just GAME_TIME_SECS
+let GAME_TIME_SECS = 0.1
 
 
 let map_len_x = 20
@@ -26,7 +27,7 @@ let map = range(map_len_y, _=>range(map_len_x, (_, i)=>i==0||i==19))
 
 // The player has no collision while jumping and inside the track
 let player_should_collide = () =>
-  !(player_z > 2 && player_x > 2 && player_x < map_len_x - 2 || player_iframes)
+  !(player_z > 2 && player_x > 2 && player_x < map_len_x - 2)
 
 let map_collide_point = (x, y) => {
   return map[y][x]
@@ -101,6 +102,7 @@ let game_start_time
 let update = () => {
   game_start_time||=Date.now()
   GAME_TIME = Date.now() - game_start_time
+  GAME_TIME_SECS += FRAME_DELTA_MS/1000
   updateWorld()
   updateApproachingRacer()
   updatePlayer()

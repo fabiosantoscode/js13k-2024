@@ -57,7 +57,7 @@ let challenge_some_guy_in_front_of_you = function*() {
             break
         }
         // SUCCEED
-        if (abs(APPROACHING_RACER[0] - player_x) < 4 && abs(APPROACHING_RACER[1] - player_y) < 3 && abs(player_z - 4) < 8) {
+        if (!player_iframes && abs(APPROACHING_RACER[0] - player_x) < 4 && abs(APPROACHING_RACER[1] - player_y) < 3 && abs(player_z - 4) < 8) {
             console.log('COLLISION SUCCESS')
             APPROACHING_RACER[2] = 2 // phase 2
             yield* yield_time(2_000)
@@ -103,7 +103,7 @@ let updateGoal = () => {
 }
 let debug_info = () => {
     if (self.env === 'production') return ''
-    return ` ${player_y}`
+    return ` ${player_y.toFixed(2)}`
 }
 let warning = ''
 let drawGoal = () => {

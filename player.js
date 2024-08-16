@@ -3,7 +3,6 @@ let player_y = 5
 let player_z = 3
 let player_natural_z = 1
 let player_natural_z_deviation = 2
-let player_ang = 0 * TAU
 let player_speed = 1.7
 let player_iframes = 0 // ++ and --. we may have iframes for 2 reasons
 
@@ -14,23 +13,23 @@ let player_inertia_z = 0.1
 let player_far_from_ground_control = 0.4
 
 let default_mov_y = 1.2
-let should_update_player = 1
 let prev_mov_x = 0
 let prev_mov_y = 0.6
 let prev_mov_z = 0
 let frames_in_natural_z = 0
+let player_lunge_forward_as_a_result_of_hitting_a_wall_speed = 5
 
 let sideways_force_from_turns_gradual = gradually_change(0, 0.05)
 
 let updatePlayer = () => {
-  if (!should_update_player) return
+  if (player_iframes) return
 
   let mov_y = default_mov_y
   let mov_x = 0
   let mov_z = 0
 
   if (isKeyPressed('w')) mov_y += 1
-  if (isKeyPressed('s')) mov_y -= .5
+  // if (isKeyPressed('s')) mov_y -= .5 // brakes
 
   if (isKeyPressed('a')) mov_x -= 1
   if (isKeyPressed('d')) mov_x += 1
@@ -103,16 +102,16 @@ let updatePlayer = () => {
 
   // Bounce the player to the center of the track
   if (has_collided) {
-    should_update_player--
     player_iframes++
     // barrel roll into the center of the track
     (async () => {
-      let end = Date.now() + 500
+      let end = Date.now() + 1000
       while (Date.now() < end) {
         player_x = lerp(player_x, map_len_x / 2, 0.3)
+        player_y += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
+        player_y = wrap_around(0, map_len_y - 1, player_y)
         await sleep(FRAME_DELTA_MS)
       }
-      should_update_player++
       player_iframes--
     })()
   }
@@ -129,7 +128,7 @@ let shaking_intensity_period = 0
 let gradual_shadow_alpha = gradually_change(1, 0.8)
 let gradual_current_turn = gradually_change(0)
 
-let draw_hull = ([tip, botLeft, botRight, top], color_left, color_right, color_highlight, lineWidth) => {
+let draw_hull = ([tip, botLeft, botRight, top], color_left, color_right, color_highlight, color_back, lineWidth) => {
   let drawTriangle = (color, lineColor, a, b, c) => {
     ctx.fillStyle = color
     ctx.beginPath()
@@ -166,7 +165,7 @@ let draw_hull = ([tip, botLeft, botRight, top], color_left, color_right, color_h
   }
 
   // back
-  drawTriangle('black', 'brown', top, botLeft, botRight)
+  drawTriangle(color_back, 'brown', top, botLeft, botRight)
 }
 
 let shrink_hull = (hull_coords, scale) => {
@@ -292,8 +291,17 @@ let drawPlayer = () => {
   ctx.filter = `none`
   ctx.globalAlpha = 1
 
+  let colorOverride
+  let colorOverride2
+  if (player_iframes) {
+    if (sin(GAME_TIME_SECS * 30) > 0) return
+
+    colorOverride = 'yellow'
+    colorOverride2 = 'red'
+  }
+
   move_hull(HULL, (canvasWidth / 20) * current_turn_gradual(CURRENT_TURN), abs(current_turn_gradual(CURRENT_TURN)) * -2)
-  draw_hull(HULL, 'green', 'gray', 'purple', 1.5)
+  draw_hull(HULL, colorOverride||'green', colorOverride||'gray', colorOverride2||'purple', colorOverride||'black', 1.5)
 
   draw_hull_burninators(HULL, false, 1, burn_intensity)
 }

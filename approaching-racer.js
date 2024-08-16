@@ -56,6 +56,6 @@ let drawApproachingRacer = () => {
     shrink_hull(hull, dist_scale)
     // Lower the tip. It's far from you
     hull[0][1] += 7 - (4 * (distance / RENDER_DIST))
-    draw_hull(hull, 'white', 'white', sin(game_s * 15) > 0.3 ? 'red' : 'yellow', dist_scale)
+    draw_hull(hull, 'white', 'white', sin(game_s * 15) > 0.3 ? 'red' : 'yellow', 'black', dist_scale)
     draw_hull_burninators(hull, true, dist_scale, 1)
 }
