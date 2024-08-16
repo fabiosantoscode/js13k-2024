@@ -109,6 +109,8 @@ let updatePlayer = () => {
       while (Date.now() < end) {
         player_x = lerp(player_x, map_len_x / 2, 0.3)
         player_y += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
+        prev_mov_y = delayed_mov_y = player_speed + 0.4 // simulate high speed for other componets of the game
+        mov_y = player_speed + 0.2 // simulate high speed for other componets of the game
         player_y = wrap_around(0, map_len_y - 1, player_y)
         await sleep(FRAME_DELTA_MS)
       }
@@ -294,14 +296,25 @@ let drawPlayer = () => {
   let colorOverride
   let colorOverride2
   if (player_iframes) {
-    if (sin(GAME_TIME_SECS * 30) > 0) return
+    if (sin(GAME_TIME_SECS * 30) < 0) return
 
     colorOverride = 'yellow'
     colorOverride2 = 'red'
+
+    if (sin(GAME_TIME_SECS * 30) > 0.8) {
+      colorOverride = 'red'
+      colorOverride2 = 'yellow'
+    }
   }
 
   move_hull(HULL, (canvasWidth / 20) * current_turn_gradual(CURRENT_TURN), abs(current_turn_gradual(CURRENT_TURN)) * -2)
   draw_hull(HULL, colorOverride||'green', colorOverride||'gray', colorOverride2||'purple', colorOverride||'black', 1.5)
+
+  // Move the hull backwards to draw the burninators behind it
+  let diff_x = clamp(-2, 2, (top[0] - tip[0]))
+  let diff_y = clamp(-2, 2, (top[1] - tip[1]))
+
+  move_hull(HULL, diff_x, diff_y)
 
   draw_hull_burninators(HULL, false, 1, burn_intensity)
 }
