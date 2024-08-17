@@ -68,7 +68,20 @@ let map_collide_ray = (curX, curY, direction) => {
 
 // sky above, gray below
 let screen_y_of_horizon = () => (halfHeight - (-(canvasHeight * player_z) / RENDER_DIST)) | 0
-let screen_y_at_distance = distance => (halfHeight - (-(canvasHeight * player_z) / distance)) | 0
+let screen_y_at_distance = (z, distance) => {
+  let relative_z = player_z - z
+  let screenY = (relative_z + 2) / distance
+  return (screenY * canvasHeight) + halfHeight
+}
+let screen_x_at_distance = (x, distance) => {
+   let angle = (CURRENT_TURN * .3) // TODO how does "spread" apply here
+   let relativeX = (x - player_x) * Math.cos(angle) + (distance * Math.sin(angle));
+
+   let screenX = ((2 * Math.tan(FOV / 2)) * (relativeX / distance));
+
+   // The screen X position is calculated using the formula: sx = (2 * tan(FoV/2)) * ((x - origin) / distance)
+   return ((screenX * canvasWidth) + halfWidth) | 0;
+}
 
 /** @returns {Array<[x, hit_x, hit_y, distance]>} */
 let get_distance_buffer = () => {
@@ -194,4 +207,45 @@ let drawWorld = () => {
     (abyss_h|0) + 10
   )
   ctx.filter = 'none'
+
+  /*
+  // Draw debug fake 3D lines
+  ctx.fillStyle = 'green'
+  // (20, 2, 2)
+  ctx.fillRect(screen_x_at_distance(5, 2), screen_y_at_distance(2, 2) - 1, 1, 1)
+  // (20, 10, 2)
+  ctx.fillRect(screen_x_at_distance(5, 10), screen_y_at_distance(2, 10) - 1, 1, 1)
+  // (20, 20, 2)
+  ctx.fillRect(screen_x_at_distance(5, 20), screen_y_at_distance(2, 20) - 1, 1, 1)
+  // (20, 30, 2)
+  ctx.fillRect(screen_x_at_distance(5, 30), screen_y_at_distance(2, 30) - 1, 1, 1)
+
+  // (20, 2, 2)
+  ctx.fillRect(screen_x_at_distance(5, 2), screen_y_at_distance(0, 2) - 1, 1, 1)
+  // (20, 10, 2)
+  ctx.fillRect(screen_x_at_distance(5, 10), screen_y_at_distance(0, 10) - 1, 1, 1)
+  // (20, 20, 2)
+  ctx.fillRect(screen_x_at_distance(5, 20), screen_y_at_distance(0, 20) - 1, 1, 1)
+  // (20, 30, 2)
+  ctx.fillRect(screen_x_at_distance(5, 30), screen_y_at_distance(0, 30) - 1, 1, 1)
+
+  // (20, 2, 2)
+  ctx.fillRect(screen_x_at_distance(15, 2), screen_y_at_distance(2, 2) - 1, 1, 1)
+  // (20, 10, 2)
+  ctx.fillRect(screen_x_at_distance(15, 10), screen_y_at_distance(2, 10) - 1, 1, 1)
+  // (20, 20, 2)
+  ctx.fillRect(screen_x_at_distance(15, 20), screen_y_at_distance(2, 20) - 1, 1, 1)
+  // (20, 30, 2)
+  ctx.fillRect(screen_x_at_distance(15, 30), screen_y_at_distance(2, 30) - 1, 1, 1)
+
+  // (20, 2, 2)
+  ctx.fillRect(screen_x_at_distance(15, 2), screen_y_at_distance(0, 2) - 1, 1, 1)
+  // (20, 10, 2)
+  ctx.fillRect(screen_x_at_distance(15, 10), screen_y_at_distance(0, 10) - 1, 1, 1)
+  // (20, 20, 2)
+  ctx.fillRect(screen_x_at_distance(15, 20), screen_y_at_distance(0, 20) - 1, 1, 1)
+  // (20, 30, 2)
+  ctx.fillRect(screen_x_at_distance(15, 30), screen_y_at_distance(0, 30) - 1, 1, 1)
+  */
+  
 }

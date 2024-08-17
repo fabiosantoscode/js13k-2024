@@ -2,6 +2,10 @@
 let approaching_racer_speed = default_mov_y - 0.2
 
 // (see goal.js) an approaching racer. You must kick them in the back so they get more speed
+let hasApproachingRacerBeenHit = () =>
+    APPROACHING_RACER && !player_iframes && abs(APPROACHING_RACER[0] - player_x) < 2 && abs(APPROACHING_RACER[1] - player_y) < 2 && abs(player_z - 2) < 2
+let hasApproachingRacerBeenSurpassed = () =>
+    player_y > APPROACHING_RACER[1]
 let updateApproachingRacer = () => {
     if (!APPROACHING_RACER) return
 
@@ -18,38 +22,24 @@ let drawApproachingRacer = () => {
 
     if (racer_y < player_y) return
 
-    let distance = abs((player_y - 2) - APPROACHING_RACER[1])
+    let distance = abs(player_y - APPROACHING_RACER[1])
 
     let size = ((1 * canvasHeight) / distance)|0
 
-    if (size < 3) return
+    if (distance > RENDER_DIST + 20) return
 
+    let vertical_hover = sin(GAME_TIME_SECS * 2) / 4
     // range: -1..1
-    let screen_x = (inv_lerp(
-        -(map_len_x - 2), (map_len_x - 2),
-        racer_x - player_x,
-    )-.5)*2
+    let screen_x = screen_x_at_distance(racer_x, distance)
+    let screen_x_tip = screen_x_at_distance(racer_x, distance + 1.5)
+    let screen_y = screen_y_at_distance(vertical_hover + 2 + vertical_hover, distance)
     // scale screen_x towards the screen center
     let dist_scale = remap(
         -2, RENDER_DIST,
         1, 0.2,
         distance
     ) * .8
-    dist_scale = clamp(0, 2, dist_scale)
-    screen_x *= dist_scale
-
-    let screen_y = screen_y_at_distance(distance) - 6
-    // This goes way down when it gets too close. Fix it roughly
-    if (screen_y > 120) {
-        screen_y = lerp(screen_y, 120, .12)
-        // Additionally, code some distortion into the overtaken car
-        dist_scale = lerp(dist_scale, 1, .12)
-    }
-
-    // range: 0..1
-    screen_x = remap(-1, 1, 0, 1, screen_x)
-
-    screen_x = remap(0, 1, 0, canvasWidth, screen_x)
+    dist_scale = clamp(0, 2.5, dist_scale)
 
     // Draw the halo (?)
     ctx.filter = `blur(${size}px)`
@@ -59,11 +49,10 @@ let drawApproachingRacer = () => {
 
     // Draw the hull
     let hull = create_hull(screen_x, screen_y, 0, 0)
-    let game_s = GAME_TIME / 1000
-    move_hull(hull, sin(game_s / 2) * 1, sin(game_s * 3) * 4)
-    shrink_hull(hull, dist_scale)
+    hull[0][0] = screen_x_tip
+    shrink_hull(hull, dist_scale * remap(0, 20, 1, .8, abs(screen_x - screen_x_tip)), dist_scale)
     // Lower the tip. It's far from you
     hull[0][1] += 7 - (4 * (distance / RENDER_DIST))
-    draw_hull(hull, 'white', 'white', sin(game_s * 15) > 0.3 ? 'red' : 'yellow', 'black', dist_scale)
+    draw_hull(hull, 'white', 'white', sin(GAME_TIME_SECS * 15) > 0.3 ? 'red' : 'yellow', 'black', dist_scale)
     draw_hull_burninators(hull, true, dist_scale, 1)
 }

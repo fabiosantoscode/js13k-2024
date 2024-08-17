@@ -173,7 +173,7 @@ let draw_hull = ([tip, botLeft, botRight, top], color_left, color_right, color_h
   drawTriangle(color_back, 'brown', top, botLeft, botRight)
 }
 
-let shrink_hull = (hull_coords, scale) => {
+let shrink_hull = (hull_coords, scale_x, scale_y) => {
   let midpoint_x=0, midpoint_y=0;
 
   hull_coords.forEach(([x, y]) => {
@@ -186,10 +186,10 @@ let shrink_hull = (hull_coords, scale) => {
 
   hull_coords.forEach((cx) => {
     let at_origin = cx[0] - midpoint_x;
-    at_origin *= scale
+    at_origin *= scale_x
     cx[0] = midpoint_x + at_origin;
     at_origin = cx[1] - midpoint_y;
-    at_origin *= scale
+    at_origin *= scale_y
     cx[1] = midpoint_y + at_origin;
   })
 }

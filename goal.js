@@ -47,7 +47,7 @@ let challenge_jump = function*() {
 let challenge_some_guy_in_front_of_you = function*() {
     if (goal_nth_place === 1) return; // no one is in front of us
 
-    APPROACHING_RACER = [player_x > 10 ? 5 : 15, player_y + RENDER_DIST + 2, 1]
+    APPROACHING_RACER = [player_x > 10 ? 7 : 13, player_y + RENDER_DIST + 2, 1]
 
     // Another pilot comes, and you have to hit them in the back to make sure you remain in 13th place
     yield* warn(`YOU APPROACH THE ${ordinal(goal_nth_place - 1)} CONTESTANT`)
@@ -59,14 +59,14 @@ let challenge_some_guy_in_front_of_you = function*() {
             break
         }
         // SUCCEED
-        if (!player_iframes && abs(APPROACHING_RACER[0] - player_x) < 4 && abs(APPROACHING_RACER[1] - player_y) < 3 && abs(player_z - 2) < 2) {
+        if (hasApproachingRacerBeenHit()) {
             APPROACHING_RACER[2] = 2 // phase 2 - be kicked forward
             yield* screen_message_success('SUCCESS')
             yield* yield_space(45)
             break
         }
         // FAIL
-        if (player_y > APPROACHING_RACER[1] + 3) {
+        if (hasApproachingRacerBeenSurpassed()) {
             goal_nth_place--
             yield* screen_message_success('FAILURE')
             break
