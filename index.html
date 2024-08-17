@@ -48,4 +48,321 @@ button{width:30%;height:35px;border:none;background:white;display:inline-block;p
 <button key=w>accelerate</button></div>
 </div>
 
-<script>let e=(e,l)=>Array.from({length:e},l),l=Math,{floor:t,ceil:o,sin:n,cos:i,tan:r,abs:f,round:a,min:x,max:d,random:u}=l,b=180,_=320,g=160,y=c.getContext("2d"),s=2*l.PI,p=.8,h=p,T=40,w=.1,S=.1,m=20,A=1e3,D=e(A,l=>e(m,(e,l)=>0==l||19==l)),k=(e,l)=>D[l][e],P=e=>new Promise(e),v=e=>P(l=>setTimeout(l,e)),C=(e,l,t)=>e+(l-e)*t,R=([e,l],[t,o],n)=>[C(e,t,n),C(l,o,n)],$=(e,l,t)=>(t-e)/(l-e),E=(e,l,t,o,n)=>{let i=$(e,l,n);return C(t,o,i)},I=(e,l,t)=>t<e?e:t>l?l:t,O=(e,l,t)=>t<e?l+(t-e):t>l?e+(t-l):t,G=(e,l=.1)=>t=>e=null==e?t:C(e,t,l),H=(e,l,t,o,r)=>(e-=t,l-=o,[e,l]=((e,l,t)=>[e*i(t)-l*n(t),e*n(t)+l*i(t)])(e,l,r),[e+t,l+o]),q={},F=e=>l=>q[l.key]=e;onkeydown=F(1),onkeyup=F();for(let e of document.all){let l=e.getAttribute("key");l&&(e.onpointerdown=t=>{t.preventDefault(),q[l]=1,e.setPointerCapture(t.pointerId)},e.onpointerup=t=>{t.preventDefault(),q[l]=0,e.releasePointerCapture(t.pointerId)})}let L,U,M=e=>!!q[e],J=()=>{L||=Date.now(),w=Date.now()-L,S+=.042,ae(),Ke(),Ce(),ql(),y.lineJoin="round",ye(),Ye(),Me(),Ul(),setTimeout(J,42)},N=P(e=>{c.onclick=e});y.font="20px sans-serif",y.font="20px 'Comic Sans MS'",y.textAlign="center",N.then(J),y.fillStyle="purple",y.fillText("CLICK TO START",g,90);let W,K,Y,j,z,B,Q,V,X,Z,ee,le,te,oe,ne,ie,re,fe,ae=()=>{let e,l,t=t=>{let o=(t+T+30)%A;for(e=0;e<666;e++){for(o+=1,o>=A&&(o=0),l=0;l<m;l++)D[o][l]=!(l>0&&l<19);for(l=3;--l>0;)D[o][l]=u()>.85;for(D[o][4]=u()>.95,D[o][15]=u()>.95,l=17;++l<m;)D[o][l]=u()>.85}};if(null==U)t(666);else for(let e of[333,666,995])U<e&&pe>e&&t(e);U=pe},xe=(e,l)=>(Te-e+2)/l*b+90,de=(e,l)=>{let t=.3*Sl,o=(e-se)*i(t)+l*n(t);return 2*r(.4)*(o/l)*_+g|0},ue=()=>{W=0,K="yellow",Y="purple",j="blue",z="purple",B=null,Q=null,V=86,X=44,Z=.9,ee=.9,le=0,te=0,oe="rgba(255,200,200,.4)",ne="green",ie=1},ce=(ue(),0),be=e(2e3,()=>[(u()-.5)*_*2,(u()-.5)*_*2]),_e=G(),ge=G(),ye=()=>{let l=0!=Sl?p:I(p,1.6,E(me,we,p,1.6,Ie));h=C(h,l,.1);let r,a,u,c=$(p,1.6,h),s=90- -180*Te/T,w=e=>(558+8.1*(1+c))/e,S=0,D=0,P=0,v=0,R=(()=>{let l=0;return e(170,()=>{l+=2;let e=.3*Sl,r=-f(.05*Sl),a=C(-h-e-r,h-e+r,l/_),[x,d,u]=((e,l,r)=>{let f,a,x,d,u=.1,c=u,b=n(r)*u,_=i(r)*u;for(;c<T&&(l+=_,e=O(0,19,e+=b),l=O(0,999,l),f=t(e),a=t(l),x=o(e),d=o(l),!(x>=m||d>=A||f<0||a<0));c+=u){if(k(f,a))return[f,a,c];if(k(x,d))return[x,d,c]}return[]})(se,pe,a);return[l,x,d,u]})})().map(([e,l,t,o])=>{let n=w(o)||0;for(let e=.05;e<2;e+=.05)n>b*e&&(n*=1.03);let i=-180*Te/o;return i=90-n/2-i|0,v=x(v,i),D=d(D,i+n),P||=i,S||=i+n,[e,l,o,i,n]});R.map(([e,l,t])=>{!t||t>T?null==r&&(r=e,u=!0):!0===u&&(u=!1,a=e)}),r||=0,a||=0;let G=w(T),q=r,F=s-G/2|0,L=y.createRadialGradient(g,F+100,500,g,F+100,40);if(L.addColorStop(0,K),L.addColorStop(1,Y),y.fillStyle=L,y.fillRect(0,0,_,b),W){y.fillStyle=W;for(let e of be){let[l,t]=H(...e,80,-10,-.002);e[0]=l,e[1]=t,y.beginPath(),y.moveTo(l,t),y.lineTo(l+1,t+1),y.lineTo(l+0,t+2),y.lineTo(l-1,t+1),y.lineTo(l,t),y.fill()}}if(B){y.fillStyle=B[0],y.fillRect(0,F+G,_,b);let e=1,l=3,t=l-(ce+=1)%l;for(let o=60+t;o>-2;o-=l)for(let n=0;n<m;n+=l)e=!e,y.fillStyle=B[+e],y.strokeStyle="red",y.beginPath(),y.moveTo(de(n,t+o),xe(-.5,t+o)),y.lineTo(de(n,t+o+l),xe(-.5,t+o+l)),y.lineTo(de(n+l,t+o+l),xe(-.5,t+o+l)),y.lineTo(de(n+l,t+o),xe(-.5,t+o)),y.lineTo(de(n,t+o),xe(-.5,t+o)),y.fill()}else if(Q){y.fillRect(0,F+G,_,b);let e=1,l=3,t=l-(ce+=1)%l;for(let o=T;o>0;o-=l)for(let n=0;n<m;n+=l)e=!e,y.strokeStyle=Q,y.beginPath(),y.moveTo(de(n,t+o),xe(-.5,t+o)),y.lineTo(de(n,t+o+l),xe(-.5,t+o+l)),y.lineTo(de(n+l,t+o+l),xe(-.5,t+o+l)),y.lineTo(de(n+l,t+o),xe(-.5,t+o)),y.lineTo(de(n,t+o),xe(-.5,t+o)),y.stroke()}else{let e=y.createRadialGradient(r||a,F+200,70,(r||a)-10,F+200,200);e.addColorStop(0,j),e.addColorStop(1,z),y.fillStyle=e,y.beginPath(),y.moveTo(q,F+G),y.lineTo(a||r,F+G),y.lineTo(_,(D+v)/2),y.lineTo(640,360),y.lineTo(-320,360),y.lineTo(0,(S+P)/2),y.fill()}for(let[e,l,t,o,n]of R){let i=$(T,0,t);i=I(0,1,i),y.fillStyle=0===l||19===l?`hsl(${V}deg, ${100*Z}%, ${100*(C(.1,.3,i)+le)}%)`:`hsl(${X}deg, ${100*ee}%, ${100*(C(.1,.3,i)+te)}%)`,y.fillRect(e,o,4,n)}y.filter="blur(10px)",y.fillStyle=oe,y.fillRect(_e(q)-5,F-5,ge(a-r)+10,10+(0|G)),y.filter="none"},se=9,pe=5,he=0,Te=3,we=1.7,Se=0,me=1.2,Ae=0,De=.6,ke=0,Pe=0,ve=G(0,.05),Ce=()=>{if(Se)return;let e=me,t=0,o=0;M("w")&&(e+=1),M("a")&&(t-=1),M("d")&&(t+=1);let n,i=Te-1;M(" ")&&Pe>5?(o=3,Pe=0):(Te<.05?(Te=f(Te),o=f(ke),ke=f(ke),Pe=0):f(i)>2?(o=.2*-i,Pe=0):(o=.1*-i,Pe++),o=C(ke,o,.1)),t&&e&&(t*=.8,e*=.8),t=C(Ae,t,.04),e=C(De,e,.2),Ae=t,De=e,ke=o,t-=ve(.8*Sl)*De,t=t*we+se,e=e*we+pe,o+=Te,t=O(0,19,t),e=O(0,999,e),t>0&&e>0&&t<m&&e<A&&(Te>3&&se>2&&se<18||Dl||!(n=((e,t,o,n)=>{e=a(e),t=a(t),o=a(o),n=a(n);for(let i=e;i!=o;i+=l.sign(o-e))for(let e=t;e!=n;e+=l.sign(n-t))if(k(i,e))return 1;return k(o,n)})(se,pe,t,e)))&&(se=t,pe=e,he+=De,Te=o),n&&(Se++,(async()=>{let l=Date.now()+1e3;for(;Date.now()<l;)se=C(se,10,.3),pe+=5,he+=5,De=Ie=we+.4,e=we+.2,pe=O(0,999,pe),await v(42);Se--})())},Re=0,$e=0,Ee=Ae,Ie=De,Oe=ke,Ge=0,He=0,qe=G(1,.8),Fe=G(0),Le=([e,l,t,o],n,i,r,f,a)=>{let x=(e,l,t,o,n)=>{y.fillStyle=e,y.beginPath(),y.moveTo(...t),y.lineTo(...o),y.lineTo(...n),y.lineTo(...t),y.fill(),y.lineWidth=a,y.strokeStyle=l,y.beginPath(),y.moveTo(...t),y.lineTo(...o),y.lineTo(...n),y.lineTo(...t),y.stroke(),y.lineWidth=1};o[0]<e[0]?(x(n,r,e,o,l),x(i,r,e,o,t)):(x(i,r,e,o,t),x(n,r,e,o,l)),x(f,"brown",o,l,t)},Ue=(e,l,t,o)=>{let n=[e+1,l-15],i=[e-30,l+20],r=[e+30,l+20],a=[e-1,l-2],x=o;return n[0]+=20*x,i[1]-=5*x,r[1]+=5*x,n[0]+=32*t,n[1]+=7*f(t),a[0]-=5*t*2,a[1]-=5*f(t),t<0&&(i[0]-=25*t,r[1]+=25*t,i[1]-=25*t),t>0&&(r[0]-=25*t,i[1]-=25*t,r[1]+=25*t),[n,i,r,a]},Me=()=>{Ge=Ge+=8,He+=.1,Re+=.1*f(f(De)-f(Ae));let e=I(0,10,4*I(0,1,De-me)+6*I(0,1,De-Ie))/10;$e+=e;let l=Ue(g,150,Ae,Fe(Sl)),[t,o,r,x]=l;Ee=C(Ee,Ae,.1),Ie=C(Ie,De,.1),Oe=C(Oe,ke,.1),t[1]+=5*(De-me),o[0]+=8*(Ie-me),r[0]-=8*(Ie-me);let d,u,c=1+2*(Ie-De),_=.5*I(0,1,E(me+.3,we,0,1,Ie))*(n(He)+.8)/2;t[0]+=i(Ge*c+10)*_,t[1]-=i(Ge*c+10)*_*.5,t[1]-=5*ke,x[1]+=8*ke,o[1]+=4*ke,r[1]+=4*ke;for(let e of l){let l=-2*f(Ee)+9*(Ie-me);e[1]+=l,e[1]-=C(0,4*n(Re),$(0,4,f(l))),e[0]+=n(Ge*c)*_,e[0]=1.2*a(e[0]*(5/6)),e[1]=1.2*a(e[1]*(5/6))}if(y.fillStyle="rgba(44,0,44,0.8)",y.filter="blur(4px)",y.globalAlpha=qe(+(Te<2)),y.beginPath(),y.moveTo(t[0],C(t[1],b,.8)-10),y.lineTo(o[0],C(o[1],b,.8)+3),y.lineTo(r[0],C(r[1],b,.8)+3),y.fill(),y.filter="none",y.globalAlpha=1,Se){if(n(30*S)<0)return;d="yellow",u="red",n(30*S)>.8&&(d="red",u="yellow")}var s,p,h;y.filter=`brightness(${ie})`,s=l,p=16*Je(Sl),h=-2*f(Je(Sl)),s.forEach(e=>(e[0]=e[0]+p|0,e[1]=e[1]+h|0)),Le(l,d||"green",d||"gray",u||"purple",d||"black",1.5),Ne(l,!1,1,e),y.filter="none"},Je=G(0,.01),Ne=([e,l,t,o],i,r,a)=>{o[1]+=f(o[1]-(l[1]+t[1])/2)/2;let x=e=>{for(let l=.1;l<1;l+=.1)e>l&&(e*=1.1);return.15*e},d=e=>{a>.5&&e&&(y.fillStyle="yellow",y.globalAlpha=a>.5?n(1.5*$e)>u()-.5:(10*x(a+u()))**2,y.beginPath(),y.arc(...o,20*x(a+u())*r,0,s),y.fill(),y.globalAlpha*=.6,y.filter="blur(15px)",y.fillRect(o[0]-20,o[1]-10,40*r,20+20*x(a)*r),y.filter="none",y.globalAlpha=1),o[1]-=1,y.fillStyle="orange",y.globalAlpha=a>.5?n(1.5*$e)>u()-.5:(10*a)**2,y.beginPath(),y.arc(...o,14*x(a+u())*r,0,s),y.fill(),y.globalAlpha=1,o[1]-=1,y.fillStyle=De>me?"red":"purple",y.globalAlpha=x(a+u())>.5?n(1.5*$e)>u()-.5:(10*x(a+u()))**2,y.beginPath(),y.arc(...o,10*x(a+u())*r,0,s),y.fill(),y.globalAlpha=1};if(d(!0),i)return;a*=.1,o[1]+=10*r;let c=[...o];o=R(c,l,.5),d(!1),o=R(c,t,.5),d(!1)},We=me-.2,Ke=()=>{wl&&(wl[1]+=1==wl[2]?1.5*We:15*We)},Ye=()=>{if(!wl)return;let[e,l]=wl;if(l<pe)return;let t=f(pe-wl[1]),o=180/t|0;if(t>60)return;let i=n(2*S)/4,r=de(e,t),a=de(e,t+1.5),x=xe(i+2+i,t),d=.8*E(-2,T,1,.2,t);d=I(0,2.5,d),y.filter=`blur(${o}px)`,y.fillStyle="red",y.fillRect(r-o/2,x-o/2,o,o),y.filter="none";let u=Ue(r,x,0,0);u[0][0]=a,((e,l,t)=>{let o=0,n=0;e.forEach(([e,l])=>{o+=e,n+=l}),o/=e.length,n/=e.length,e.forEach(e=>{let i=e[0]-o;i*=l,e[0]=o+i,i=e[1]-n,i*=t,e[1]=n+i})})(u,d*E(0,20,1,.8,f(r-a)),d),u[0][1]+=7-t/T*4,Le(u,"white","white",n(15*S)>.3?"red":"yellow","black",d),Ne(u,!0,d,1)},je=125,ze=e=>e.trim().split(/\s+/g),Be=ze("_ c c# d d# e f f# g g# a a# b"),Qe=(e,l)=>(e=Be.indexOf(e))&&32.7*(2**(1/12))**(e-1+12*l),Ve=(e,l)=>{e.value=l},Xe=(e,t)=>{let o=re.createOscillator(),n=re.createGain(),i=re.createGain();return document.addEventListener("visibilitychange",()=>{Ve(i.gain,document.visibilityState>"v")}),Ve(o.frequency,0),Ve(n.gain,l.log2(1+.025*e)),o.type=t,o.start(),o.connect(n).connect(i).connect(re.destination),[o.frequency,n.gain]},Ze=async(e,l,t,o,n,i)=>{for(fe of e)Ve(o,C(l,t,fe[0])*i),Ve(n,.04*(fe[1]||fe[0])),await v(10)},el=function*([l,t],o,n,i){for(;;)for(fe of ze(i)){let[,i,r,f=1]=fe.match(/^(\w#?|_)(\d?)x?(\d+)?$/);if("x"===i)Ze([[1],[.75,.7],[.75,.7],[.7],[.57,.6],[.27,.6],[.17,.5],[.1,.4],[.1,.2],[0]],111,255,l,t,n);else if("o"===i)Ze([[.4],[.8],[1],[.75,.7],[.7],[.57,.6],[.27,.6],[.17,.5],[.1,.4],[.1,.2],[0]],15,70,l,t,n);else{let e=Qe(i,r);Ve(l,e*n)}for(fe of e(o*f))yield}};je=6e4/330/2;let ll="_x24 ",tl=ll+"_x8 ",ol="o o x o x o x o ",nl="o o x o o o x o "+ol+ol+ol,il="e3x2 _x2 e3x2 d3x2 e3x2 _x2 e3x2 _x2 g3x2 _x2 g3x2 d3x2 g3x2 _x2 g3x2 _x2 ",rl="e4x2 _x2 e4x2 _x2 e4 _ g4 _ b4x2 _x2 ",fl=e=>(e+" _ ").repeat(7)+e+"x2 ",al=fl("e4"),xl="e3 _ e3 _ g3 _ a3 _ b3 _ b3 _ a3 _ g3x2 ",dl=""+al+fl("d4"),ul=""+al+fl("g4"),cl=""+xl+xl,bl=""+il+rl+rl+il+rl+"e4x2 _x2 e4x2 _x2 e4 _ d4 _ e4x2 _x2 "+dl+cl+dl+xl+fl("e3")+ul+cl+dl+xl+"b3 _ a3 _ a3x2 _x2 b3 _ a3 _ d3x2 _x2 ",_l="b3x2 _x2 b3x2 _x2 b3 _ d4 _ e4x2 _x2 ",gl=""+fl("b3")+fl("a3")+tl,yl=""+tl+_l+_l+tl+_l+"b3x2 _x2 b3x2 _x2 b3 _ a3 _ b3x2 _x2 "+gl+gl+fl("b3")+fl("d4")+tl+gl,sl="b5x2 _x2 g5x2 _x2 e5x2 _x2 b5x2 _x2 g5x2 _x2 e5x2 _x2 ",pl="e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ ",hl=pl+"b5 _ b5 _ b5x4 "+tl,Tl=sl+"b5x2 _x2 g5x2 _x2 e5x8 "+ll+sl+"b5x2 _x2 c6x2 _x2 e5x8 "+ll+hl+pl+"b5 _ a5 _ b5x4 "+tl+pl+"d6 _ e6 _ b5x4 "+tl+hl;N.then(()=>{re=new AudioContext,(async e=>{for(;;){for(let[l,t]of e)v(t).then(()=>l.next());await v(je)}})([[el(Xe(.3,"sawtooth"),1,1,bl),34],[el(Xe(.3),1,1,bl),16],[el(Xe(.1,""),1,1,yl),16],[el(Xe(.125,""),1,.5,Tl),16],[el(Xe(.3),1,1,Tl),16],[el(Xe(0,"square"),2,1,nl),0]])}),N.then(()=>sc.requestFullscreen()).catch(()=>{});let wl,Sl=0,ml=13,Al=0,Dl=0,kl=100,Pl=e=>{let l=["th","st","nd","rd"];return e+(l[e]||l[0])},vl=function*(e){for(e+=Date.now();Date.now()<e;)yield},Cl=function*(e){for(e+=he;he<e;)yield},Rl=function*(){let e=u()>.5?1:-1;yield*Gl(e<0?"HARD LEFT":"HARD RIGHT"),Al=e,yield*Cl(200),Al=0},$l=function*(){let e=Date.now();yield*Gl("JUMP");let l=pe+T+2|0;for(let e=0;e<m;e++)D[l][e]=!0;for(;pe<l&&Date.now()-e<4e3;)yield;for(let e=0;e<m;e++)D[l][e]=!1},El=function*(){if(1===ml)return;wl=[se>10?7:13,pe+T+2,1],yield*Gl(`YOU APPROACH THE ${Pl(ml-1)} CONTESTANT`);let e=Date.now()+8e3;for(;;){if(pe>900||Date.now()>e){console.log("canceled");break}if(wl&&!Se&&f(wl[0]-se)<2&&f(wl[1]-pe)<2&&f(Te-2)<2){wl[2]=2,yield*Hl("SUCCESS"),yield*Cl(45);break}if(pe>wl[1]){ml--,yield*Hl("FAILURE");break}yield}wl=0},Il=function*(e){let l=[El,$l,Rl];for(;;){if(f(pe-A)>400){let e=l[t(u()*l.length)];yield*e()}if(yield*Cl(90),kl-he<200)break}Dl++;let o=Date.now()+2500,n=Date.now()+4e3;for(;n>Date.now();){let l=pe+T+10|0,t=l+10;for(;l++<t&&l<A;)D[l][0]=!0,D[l][1]=!0,D[l][2]=!0,D[l][3]=!0,D[l][4]=!0,D[l][15]=!0,D[l][16]=!0,D[l][17]=!0,D[l][18]=!0,D[l][19]=!0;let n=f(Date.now()-o),i=250*a(n/250)/1e3;i<=1&&(e&&0==i&&(ue(),e(),e=0),c.style.opacity=i,c.style.filter=`saturate(${C(100,250,1-i)}%)`),yield}Dl--},Ol=function*(){yield,yield*Il(()=>{W="rgba(255,255,255,0.3)",K="#3377cc",Y="black",j="#133",z="#111",B=null,V=320,X=230,oe="rgba(180,50,150,.4)",ie=1.8}),kl=he+2e3,yield*Il(()=>{W=null,K="#ff899c",Y="#ff899c",j=null,z=null,B=["#ff89a4","#1b1a1c"],Q=null,V=195,X=34,Z=.02,ee=.24,le=.5,te=.4,oe="#e1a1fe",ne="#87e7c0",ie=1.5}),kl=he+2e3,yield*Il(()=>{W="red",j=0,z=0,Q="green",B=null,V=0,le=.3,X=145,te=.1,ie=1.8}),kl=he+2e3,yield*Il(()=>{}),kl=he+2e3,console.log("you finished the game")}(),Gl=function*(e){Fl=e,yield*vl(800),Fl=""},Hl=function*(e){Ll=e,yield*vl(800),Ll=""},ql=()=>{Ol.next(),Sl=C(Sl,Al,.05),0==Al&&f(Sl)<.05&&(Sl=0)},Fl="",Ll="",Ul=()=>{y.fillStyle=Fl?n(9*w)>0?"red":"yellow":Ll?n(9*w)>0?"purple":"blue":ne,y.fillText(Fl||Ll||Pl(ml)+` ${(24*De).toFixed(2)}`,g,20)};</script>
+<script>let e = (e, l) => Array.from({
+    length: e
+}, l), l = Math, {floor: t, ceil: o, sin: n, cos: i, tan: r, abs: f, round: a, min: x, max: d, random: u} = l, _ = 180, b = 320, y = 160, g = c.getContext("2d"), p = 2 * l.PI, s = .8, T = s, h = 40, w = .1, S = .1, m = 20, A = 1e3, D = e(A, l => e(m, (e, l) => 0 == l || 19 == l)), k = (e, l) => D[l][e], v = e => new Promise(e), P = e => v(l => setTimeout(l, e)), C = (e, l, t) => e + (l - e) * t, R = ([e, l], [t, o], n) => [ C(e, t, n), C(l, o, n) ], $ = (e, l, t) => (t - e) / (l - e), E = (e, l, t, o, n) => {
+    let i = $(e, l, n);
+    return C(t, o, i);
+}, I = (e, l, t) => t < e ? e : t > l ? l : t, G = (e, l, t) => t < e ? l + (t - e) : t > l ? e + (t - l) : t, q = (e, l = .1) => t => e = null == e ? t : C(e, t, l), F = (e, l, t, o, r) => (e -= t, 
+l -= o, [e, l] = ((e, l, t) => [ e * i(t) - l * n(t), e * n(t) + l * i(t) ])(e, l, r), 
+[ e + t, l + o ]), L = {}, O = e => l => L[l.key] = e;
+
+onkeydown = O(1), onkeyup = O();
+
+for (let e of document.all) {
+    let l = e.getAttribute("key");
+    l && (e.onpointerdown = t => {
+        t.preventDefault(), L[l] = 1, e.setPointerCapture(t.pointerId);
+    }, e.onpointerup = t => {
+        t.preventDefault(), L[l] = 0, e.releasePointerCapture(t.pointerId);
+    });
+}
+
+let H, M, U = e => !!L[e], J = () => {
+    H ||= Date.now(), w = Date.now() - H, S += .042, ae(), Ke(), Ce(), Ll(), g.lineJoin = "round", 
+    ge(), je(), Ue(), Ml(), setTimeout(J, 42);
+}, N = v(e => {
+    c.onclick = e;
+});
+
+g.font = "20px sans-serif", g.font = "20px 'Comic Sans MS'", g.textAlign = "center", 
+N.then(J), g.fillStyle = "purple", g.fillText("CLICK TO START", y, 90);
+
+let W, K, j, z, B, Q, V, X, Y, Z, ee, le, te, oe, ne, ie, re, fe, ae = () => {
+    let e, l, t = t => {
+        let o = (t + h + 30) % A;
+        for (e = 0; e < 666; e++) {
+            for (o += 1, o >= A && (o = 0), l = 0; l < m; l++) D[o][l] = !(l > 0 && l < 19);
+            for (l = 3; --l > 0; ) D[o][l] = u() > .85;
+            for (D[o][4] = u() > .95, D[o][15] = u() > .95, l = 17; ++l < m; ) D[o][l] = u() > .85;
+        }
+    };
+    if (null == M) t(666); else for (let e of [ 333, 666, 995 ]) M < e && se > e && t(e);
+    M = se;
+}, xe = (e, l) => (he - e + 2) / l * _ + 90, de = (e, l) => {
+    let t = .3 * Sl, o = (e - pe) * i(t) + l * n(t);
+    return 2 * r(.4) * (o / l) * b + y | 0;
+}, ue = () => {
+    W = 0, K = "yellow", j = "purple", z = "blue", B = "purple", Q = null, V = null, 
+    X = 86, Y = 44, Z = .9, ee = .9, le = 0, te = 0, oe = "rgba(255,200,200,.4)", ne = "green", 
+    ie = 1;
+}, ce = (ue(), 0), _e = e(2e3, () => [ (u() - .5) * b * 2, (u() - .5) * b * 2 ]), be = q(), ye = q(), ge = () => {
+    let l = 0 != Sl ? s : I(s, 1.6, E(me, we, s, 1.6, Ie));
+    T = C(T, l, .1);
+    let r, a, u, c = $(s, 1.6, T), p = 90 - -180 * he / h, w = e => (558 + 8.1 * (1 + c)) / e, S = 0, D = 0, v = 0, P = 0, R = (() => {
+        let l = 0;
+        return e(170, () => {
+            l += 2;
+            let e = .3 * Sl, r = -f(.05 * Sl), a = C(-T - e - r, T - e + r, l / b), [x, d, u] = ((e, l, r) => {
+                let f, a, x, d, u = .1, c = u, _ = n(r) * u, b = i(r) * u;
+                for (;c < h && (l += b, e = G(0, 19, e += _), l = G(0, 999, l), f = t(e), a = t(l), 
+                x = o(e), d = o(l), !(x >= m || d >= A || f < 0 || a < 0)); c += u) {
+                    if (k(f, a)) return [ f, a, c ];
+                    if (k(x, d)) return [ x, d, c ];
+                }
+                return [];
+            })(pe, se, a);
+            return [ l, x, d, u ];
+        });
+    })().map(([e, l, t, o]) => {
+        let n = w(o) || 0;
+        for (let e = .05; e < 2; e += .05) n > _ * e && (n *= 1.03);
+        let i = -180 * he / o;
+        return i = 90 - n / 2 - i | 0, P = x(P, i), D = d(D, i + n), v ||= i, S ||= i + n, 
+        [ e, l, o, i, n ];
+    });
+    R.map(([e, l, t]) => {
+        !t || t > h ? null == r && (r = e, u = !0) : !0 === u && (u = !1, a = e);
+    }), r ||= 0, a ||= 0;
+    let q = w(h), L = r, O = p - q / 2 | 0, H = g.createRadialGradient(y, O + 100, 500, y, O + 100, 40);
+    if (H.addColorStop(0, K), H.addColorStop(1, j), g.fillStyle = H, g.fillRect(0, 0, b, _), 
+    W) {
+        g.fillStyle = W;
+        for (let e of _e) {
+            let [l, t] = F(...e, 80, -10, -.002);
+            e[0] = l, e[1] = t, g.beginPath(), g.moveTo(l, t), g.lineTo(l + 1, t + 1), g.lineTo(l + 0, t + 2), 
+            g.lineTo(l - 1, t + 1), g.lineTo(l, t), g.fill();
+        }
+    }
+    if (Q) {
+        g.fillStyle = Q[0], g.fillRect(0, O + q, b, _);
+        let e = 1, l = 3, t = l - (ce += 1) % l;
+        for (let o = 60 + t; o > -2; o -= l) for (let n = 0; n < m; n += l) e = !e, g.fillStyle = Q[+e], 
+        g.strokeStyle = "red", g.beginPath(), g.moveTo(de(n, t + o), xe(-.5, t + o)), g.lineTo(de(n, t + o + l), xe(-.5, t + o + l)), 
+        g.lineTo(de(n + l, t + o + l), xe(-.5, t + o + l)), g.lineTo(de(n + l, t + o), xe(-.5, t + o)), 
+        g.lineTo(de(n, t + o), xe(-.5, t + o)), g.fill();
+    } else if (V) {
+        g.fillRect(0, O + q, b, _);
+        let e = 1, l = 3, t = l - (ce += 1) % l;
+        for (let o = h; o > 0; o -= l) for (let n = 0; n < m; n += l) e = !e, g.strokeStyle = V, 
+        g.beginPath(), g.moveTo(de(n, t + o), xe(-.5, t + o)), g.lineTo(de(n, t + o + l), xe(-.5, t + o + l)), 
+        g.lineTo(de(n + l, t + o + l), xe(-.5, t + o + l)), g.lineTo(de(n + l, t + o), xe(-.5, t + o)), 
+        g.lineTo(de(n, t + o), xe(-.5, t + o)), g.stroke();
+    } else {
+        let e = g.createRadialGradient(r || a, O + 200, 70, (r || a) - 10, O + 200, 200);
+        e.addColorStop(0, z), e.addColorStop(1, B), g.fillStyle = e, g.beginPath(), g.moveTo(L, O + q), 
+        g.lineTo(a || r, O + q), g.lineTo(b, (D + P) / 2), g.lineTo(640, 360), g.lineTo(-320, 360), 
+        g.lineTo(0, (S + v) / 2), g.fill();
+    }
+    for (let [e, l, t, o, n] of R) {
+        let i = $(h, 0, t);
+        i = I(0, 1, i), g.fillStyle = 0 === l || 19 === l ? `hsl(${X}deg, ${100 * Z}%, ${100 * (C(.1, .3, i) + le)}%)` : `hsl(${Y}deg, ${100 * ee}%, ${100 * (C(.1, .3, i) + te)}%)`, 
+        g.fillRect(e, o, 4, n);
+    }
+    g.filter = "blur(10px)", g.fillStyle = oe, g.fillRect(be(L) - 5, O - 5, ye(a - r) + 10, 10 + (0 | q)), 
+    g.filter = "none";
+}, pe = 9, se = 5, Te = 0, he = 3, we = 1.7, Se = 0, me = 1.2, Ae = 0, De = .6, ke = 0, ve = 0, Pe = q(0, .05), Ce = () => {
+    if (Se) return;
+    let e = me, l = 0, t = 0;
+    U("w") && (e += 1), U("a") && (l -= 1), U("d") && (l += 1);
+    let o, n = he - 1;
+    U(" ") && ve > 5 ? (t = 3, ve = 0) : (he < .05 ? (he = f(he), t = f(ke), ke = f(ke), 
+    ve = 0) : f(n) > 2 ? (t = .2 * -n, ve = 0) : (t = .1 * -n, ve++), t = C(ke, t, .1)), 
+    l && e && (l *= .8, e *= .8), l = C(Ae, l, .04), e = C(De, e, .2), Ae = l, De = e, 
+    ke = t, l -= Pe(.8 * Sl) * De, l = l * we + pe, e = e * we + se, t += he, l = G(0, 19, l), 
+    e = G(0, 999, e), l > 0 && e > 0 && l < m && e < A && (he > 6 && pe > 2 && pe < 18 || Dl || !(o = ((e, l, t, o, n = 1 / 32) => {
+        for (let i = 0; i <= 1; i += n) if (k(a(C(e, t, i)), a(C(l, o, i)))) return 1;
+    })(pe, se, l, e))) && (pe = l, se = e, Te += De, he = t), o && (Se++, (async () => {
+        let l = Date.now() + 1e3;
+        for (;Date.now() < l; ) pe = C(pe, 10, .3), se += 5, Te += 5, De = Ie = we + .4, 
+        e = we + .2, se = G(0, 999, se), await P(42);
+        Se--;
+    })());
+}, Re = 0, $e = 0, Ee = Ae, Ie = De, Ge = ke, qe = 0, Fe = 0, Le = q(1, .8), Oe = q(0), He = ([e, l, t, o], n, i, r, f, a) => {
+    let x = (e, l, t, o, n) => {
+        g.fillStyle = e, g.beginPath(), g.moveTo(...t), g.lineTo(...o), g.lineTo(...n), 
+        g.lineTo(...t), g.fill(), g.lineWidth = a, g.strokeStyle = l, g.beginPath(), g.moveTo(...t), 
+        g.lineTo(...o), g.lineTo(...n), g.lineTo(...t), g.stroke(), g.lineWidth = 1;
+    };
+    o[0] < e[0] ? (x(n, r, e, o, l), x(i, r, e, o, t)) : (x(i, r, e, o, t), x(n, r, e, o, l)), 
+    x(f, "brown", o, l, t);
+}, Me = (e, l, t, o) => {
+    let n = [ e + 1, l - 15 ], i = [ e - 30, l + 20 ], r = [ e + 30, l + 20 ], a = [ e - 1, l - 2 ], x = o;
+    return n[0] += 20 * x, i[1] -= 5 * x, r[1] += 5 * x, n[0] += 32 * t, n[1] += 7 * f(t), 
+    a[0] -= 5 * t * 2, a[1] -= 5 * f(t), t < 0 && (i[0] -= 25 * t, r[1] += 25 * t, i[1] -= 25 * t), 
+    t > 0 && (r[0] -= 25 * t, i[1] -= 25 * t, r[1] += 25 * t), [ n, i, r, a ];
+}, Ue = () => {
+    qe = qe += 8, Fe += .1, Re += .1 * f(f(De) - f(Ae));
+    let e = I(0, 10, 4 * I(0, 1, De - me) + 6 * I(0, 1, De - Ie)) / 10;
+    $e += e;
+    let l = Me(y, 150, Ae, Oe(Sl)), [t, o, r, x] = l;
+    Ee = C(Ee, Ae, .1), Ie = C(Ie, De, .1), Ge = C(Ge, ke, .1), t[1] += 5 * (De - me), 
+    o[0] += 8 * (Ie - me), r[0] -= 8 * (Ie - me);
+    let d, u, c = 1 + 2 * (Ie - De), b = .5 * I(0, 1, E(me + .3, we, 0, 1, Ie)) * (n(Fe) + .8) / 2;
+    t[0] += i(qe * c + 10) * b, t[1] -= i(qe * c + 10) * b * .5, t[1] -= 5 * ke, x[1] += 8 * ke, 
+    o[1] += 4 * ke, r[1] += 4 * ke;
+    for (let e of l) {
+        let l = -2 * f(Ee) + 9 * (Ie - me);
+        e[1] += l, e[1] -= C(0, 4 * n(Re), $(0, 4, f(l))), e[0] += n(qe * c) * b, e[0] = 1.2 * a(e[0] * (5 / 6)), 
+        e[1] = 1.2 * a(e[1] * (5 / 6));
+    }
+    if (g.fillStyle = "rgba(44,0,44,0.8)", g.filter = "blur(4px)", g.globalAlpha = Le(+(he < 2)), 
+    g.beginPath(), g.moveTo(t[0], C(t[1], _, .8) - 10), g.lineTo(o[0], C(o[1], _, .8) + 3), 
+    g.lineTo(r[0], C(r[1], _, .8) + 3), g.fill(), g.filter = "none", g.globalAlpha = 1, 
+    Se) {
+        if (n(30 * S) < 0) return;
+        d = "yellow", u = "red", n(30 * S) > .8 && (d = "red", u = "yellow");
+    }
+    var p, s, T;
+    g.filter = `brightness(${ie})`, p = l, s = 16 * Je(Sl), T = -2 * f(Je(Sl)), p.forEach(e => (e[0] = e[0] + s | 0, 
+    e[1] = e[1] + T | 0)), He(l, d || "green", d || "gray", u || "purple", d || "black", 1.5), 
+    Ne(l, !1, 1, e), g.filter = "none";
+}, Je = q(0, .01), Ne = ([e, l, t, o], i, r, a) => {
+    o[1] += f(o[1] - (l[1] + t[1]) / 2) / 2;
+    let x = e => {
+        for (let l = .1; l < 1; l += .1) e > l && (e *= 1.1);
+        return .15 * e;
+    }, d = e => {
+        a > .5 && e && (g.fillStyle = "yellow", g.globalAlpha = a > .5 ? n(1.5 * $e) > u() - .5 : (10 * x(a + u())) ** 2, 
+        g.beginPath(), g.arc(...o, 20 * x(a + u()) * r, 0, p), g.fill(), g.globalAlpha *= .6, 
+        g.filter = "blur(15px)", g.fillRect(o[0] - 20, o[1] - 10, 40 * r, 20 + 20 * x(a) * r), 
+        g.filter = "none", g.globalAlpha = 1), o[1] -= 1, g.fillStyle = "orange", g.globalAlpha = a > .5 ? n(1.5 * $e) > u() - .5 : (10 * a) ** 2, 
+        g.beginPath(), g.arc(...o, 14 * x(a + u()) * r, 0, p), g.fill(), g.globalAlpha = 1, 
+        o[1] -= 1, g.fillStyle = De > me ? "red" : "purple", g.globalAlpha = x(a + u()) > .5 ? n(1.5 * $e) > u() - .5 : (10 * x(a + u())) ** 2, 
+        g.beginPath(), g.arc(...o, 10 * x(a + u()) * r, 0, p), g.fill(), g.globalAlpha = 1;
+    };
+    if (d(!0), i) return;
+    a *= .1, o[1] += 10 * r;
+    let c = [ ...o ];
+    o = R(c, l, .5), d(!1), o = R(c, t, .5), d(!1);
+}, We = me - .2, Ke = () => {
+    wl && (wl[1] += 1 == wl[2] ? 1.5 * We : 15 * We);
+}, je = () => {
+    if (!wl) return;
+    let [e, l] = wl;
+    if (l < se) return;
+    let t = f(se - wl[1]), o = 180 / t | 0;
+    if (t > 60) return;
+    let i = n(2 * S) / 4, r = de(e, t), a = de(e, t + 1.5), x = xe(i + 2 + i, t), d = .8 * E(-2, h, 1, .2, t);
+    d = I(0, 2.5, d), g.filter = `blur(${o}px)`, g.fillStyle = "red", g.fillRect(r - o / 2, x - o / 2, o, o), 
+    g.filter = "none";
+    let u = Me(r, x, 0, 0);
+    u[0][0] = a, ((e, l, t) => {
+        let o = 0, n = 0;
+        e.forEach(([e, l]) => {
+            o += e, n += l;
+        }), o /= e.length, n /= e.length, e.forEach(e => {
+            let i = e[0] - o;
+            i *= l, e[0] = o + i, i = e[1] - n, i *= t, e[1] = n + i;
+        });
+    })(u, d * E(0, 20, 1, .8, f(r - a)), d), u[0][1] += 7 - t / h * 4, He(u, "white", "white", n(15 * S) > .3 ? "red" : "yellow", "black", d), 
+    Ne(u, !0, d, 1);
+}, ze = 125, Be = e => e.trim().split(/\s+/g), Qe = Be("_ c c# d d# e f f# g g# a a# b"), Ve = (e, l) => (e = Qe.indexOf(e)) && 32.7 * (2 ** (1 / 12)) ** (e - 1 + 12 * l), Xe = (e, l) => {
+    e.value = l;
+}, Ye = (e, t) => {
+    let o = re.createOscillator(), n = re.createGain(), i = re.createGain();
+    return document.addEventListener("visibilitychange", () => {
+        Xe(i.gain, document.visibilityState > "v");
+    }), Xe(o.frequency, 0), Xe(n.gain, l.log2(1 + .025 * e)), o.type = t, o.start(), 
+    o.connect(n).connect(i).connect(re.destination), [ o.frequency, n.gain ];
+}, Ze = async (e, l, t, o, n, i) => {
+    for (fe of e) Xe(o, C(l, t, fe[0]) * i), Xe(n, .04 * (fe[1] || fe[0])), await P(10);
+}, el = function*([l, t], o, n, i) {
+    for (;;) for (fe of Be(i)) {
+        let [, i, r, f = 1] = fe.match(/^(\w#?|_)(\d?)x?(\d+)?$/);
+        if ("x" === i) Ze([ [ 1 ], [ .75, .7 ], [ .75, .7 ], [ .7 ], [ .57, .6 ], [ .27, .6 ], [ .17, .5 ], [ .1, .4 ], [ .1, .2 ], [ 0 ] ], 111, 255, l, t, n); else if ("o" === i) Ze([ [ .4 ], [ .8 ], [ 1 ], [ .75, .7 ], [ .7 ], [ .57, .6 ], [ .27, .6 ], [ .17, .5 ], [ .1, .4 ], [ .1, .2 ], [ 0 ] ], 15, 70, l, t, n); else {
+            let e = Ve(i, r);
+            Xe(l, e * n);
+        }
+        for (fe of e(o * f)) yield;
+    }
+};
+
+ze = 6e4 / 330 / 2;
+
+let ll = "_x24 ", tl = ll + "_x8 ", ol = "o o x o x o x o ", nl = "o o x o o o x o " + ol + ol + ol, il = "e3x2 _x2 e3x2 d3x2 e3x2 _x2 e3x2 _x2 g3x2 _x2 g3x2 d3x2 g3x2 _x2 g3x2 _x2 ", rl = "e4x2 _x2 e4x2 _x2 e4 _ g4 _ b4x2 _x2 ", fl = e => (e + " _ ").repeat(7) + e + "x2 ", al = fl("e4"), xl = "e3 _ e3 _ g3 _ a3 _ b3 _ b3 _ a3 _ g3x2 ", dl = "" + al + fl("d4"), ul = "" + al + fl("g4"), cl = "" + xl + xl, _l = "" + il + rl + rl + il + rl + "e4x2 _x2 e4x2 _x2 e4 _ d4 _ e4x2 _x2 " + dl + cl + dl + xl + fl("e3") + ul + cl + dl + xl + "b3 _ a3 _ a3x2 _x2 b3 _ a3 _ d3x2 _x2 ", bl = "b3x2 _x2 b3x2 _x2 b3 _ d4 _ e4x2 _x2 ", yl = "" + fl("b3") + fl("a3") + tl, gl = "" + tl + bl + bl + tl + bl + "b3x2 _x2 b3x2 _x2 b3 _ a3 _ b3x2 _x2 " + yl + yl + fl("b3") + fl("d4") + tl + yl, pl = "b5x2 _x2 g5x2 _x2 e5x2 _x2 b5x2 _x2 g5x2 _x2 e5x2 _x2 ", sl = "e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ ", Tl = sl + "b5 _ b5 _ b5x4 " + tl, hl = pl + "b5x2 _x2 g5x2 _x2 e5x8 " + ll + pl + "b5x2 _x2 c6x2 _x2 e5x8 " + ll + Tl + sl + "b5 _ a5 _ b5x4 " + tl + sl + "d6 _ e6 _ b5x4 " + tl + Tl;
+
+N.then(() => {
+    re = new AudioContext, (async e => {
+        for (;;) {
+            for (let [l, t] of e) P(t).then(() => l.next());
+            await P(ze);
+        }
+    })([ [ el(Ye(.3, "sawtooth"), 1, 1, _l), 34 ], [ el(Ye(.3), 1, 1, _l), 16 ], [ el(Ye(.1, ""), 1, 1, gl), 16 ], [ el(Ye(.125, ""), 1, .5, hl), 16 ], [ el(Ye(.3), 1, 1, hl), 16 ], [ el(Ye(0, "square"), 2, 1, nl), 0 ] ]);
+}), N.then(() => sc.requestFullscreen()).catch(() => {});
+
+let wl, Sl = 0, ml = 13, Al = 0, Dl = 0, kl = 0, vl = e => {
+    let l = [ "th", "st", "nd", "rd" ];
+    return e + (l[e] || l[0]);
+}, Pl = function*(e) {
+    for (e += Date.now(); Date.now() < e; ) yield;
+}, Cl = function*(e) {
+    for (e += Te; Te < e; ) yield;
+}, Rl = function*() {
+    let e = u() > .5 ? 1 : -1;
+    yield* ql(e < 0 ? "HARD LEFT" : "HARD RIGHT"), Al = e, yield* Cl(100), Al = 0;
+}, $l = function*() {
+    let e = Date.now();
+    yield* ql("JUMP");
+    let l = se + h + 2 | 0;
+    for (let e = 0; e < m; e++) D[l][e] = !0;
+    for (;se < l && Date.now() - e < 4e3; ) yield;
+    for (let e = 0; e < m; e++) D[l][e] = !1;
+}, El = function*() {
+    if (1 === ml) return;
+    wl = [ pe > 10 ? 7 : 13, se + h + 2, 1 ], yield* ql(`${vl(ml - 1)} CONTESTANT`);
+    let e = Date.now() + 8e3;
+    for (;!(se > 900 || Date.now() > e); ) {
+        if (wl && !Se && f(wl[0] - pe) < 2 && f(wl[1] - se) < 2 && f(he - 2) < 2) {
+            wl[2] = 2, yield* Fl("SUCCESS"), yield* Cl(45);
+            break;
+        }
+        if (se > wl[1]) {
+            ml--, yield* Fl("FAILURE");
+            break;
+        }
+        yield;
+    }
+    wl = 0;
+}, Il = function*(e) {
+    let l = [ El, $l, Rl ];
+    for (;;) {
+        if (f(se - A) > 400) {
+            let e = l[t(u() * l.length)];
+            yield* e();
+        }
+        if (yield* Cl(90), kl - Te < 200) break;
+    }
+    Dl++;
+    let o = Date.now() + 2500, n = Date.now() + 4e3;
+    for (;n > Date.now(); ) {
+        let l = se + h + 10 | 0, t = l + 10;
+        for (;l++ < t && l < A; ) D[l][0] = !0, D[l][1] = !0, D[l][2] = !0, D[l][3] = !0, 
+        D[l][4] = !0, D[l][15] = !0, D[l][16] = !0, D[l][17] = !0, D[l][18] = !0, D[l][19] = !0;
+        let n = f(Date.now() - o), i = 250 * a(n / 250) / 1e3;
+        i <= 1 && (e && 0 == i && (ue(), e(), e = 0), c.style.opacity = i, c.style.filter = `saturate(${C(100, 250, 1 - i)}%)`), 
+        yield;
+    }
+    Dl--;
+}, Gl = function*() {
+    yield, kl = Te + 2e3, yield* Il(() => {
+        W = "rgba(255,255,255,0.3)", K = "#3377cc", j = "black", z = "#133", B = "#111", 
+        Q = null, X = 320, Y = 230, oe = "rgba(180,50,150,.4)", ie = 1.8;
+    }), kl = Te + 2e3, yield* Il(() => {
+        W = null, K = "#ff899c", j = "#ff899c", z = null, B = null, Q = [ "#ff89a4", "#1b1a1c" ], 
+        V = null, X = 195, Y = 34, Z = .02, ee = .24, le = .5, te = .4, oe = "#e1a1fe", 
+        ne = "#87e7c0", ie = 1.5;
+    }), kl = Te + 2e3, yield* Il(() => {
+        W = "red", z = 0, B = 0, V = "green", Q = null, X = 0, le = .3, Y = 145, te = .1, 
+        ie = 1.8;
+    }), kl = Te + 2e3, yield* Il(() => {}), kl = Te + 2e3;
+}(), ql = function*(e) {
+    Ol = e, yield* Pl(800), Ol = "";
+}, Fl = function*(e) {
+    Hl = e, yield* Pl(800), Hl = "";
+}, Ll = () => {
+    Gl.next(), Sl = C(Sl, Al, .05), 0 == Al && f(Sl) < .05 && (Sl = 0);
+}, Ol = "", Hl = "", Ml = () => {
+    g.fillStyle = Ol ? n(9 * w) > 0 ? "red" : "yellow" : Hl ? n(9 * w) > 0 ? "purple" : "blue" : ne, 
+    g.fillText(Ol || Hl || vl(ml) + ` ${(24 * De).toFixed(2)}`, y, 20);
+};</script>
