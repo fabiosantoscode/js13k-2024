@@ -20,7 +20,7 @@ let updateWorld = () => {
       }
     }
   }
-  if (!prev_player_y) {
+  if (prev_player_y==null) {
     // generate first chunks
     generate_invisible_part_of_the_map(third * 2)
   } else {

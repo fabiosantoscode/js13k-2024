@@ -1,5 +1,6 @@
 let player_x = 9
 let player_y = 5
+let player_y_nowrap = 0
 let player_z = 3
 let player_natural_z = 1
 let player_natural_z_deviation = 2
@@ -71,7 +72,7 @@ let updatePlayer = () => {
   prev_mov_y = mov_y
   prev_mov_z = mov_z
 
-  let sideways_force_from_turns = sideways_force_from_turns_gradual(CURRENT_TURN * .5)
+  let sideways_force_from_turns = sideways_force_from_turns_gradual(CURRENT_TURN * .8)
   mov_x -= sideways_force_from_turns * prev_mov_y
 
   // try new position to see how we feel
@@ -97,6 +98,7 @@ let updatePlayer = () => {
   ) {
     player_x = mov_x
     player_y = mov_y
+    player_y_nowrap += prev_mov_y
     player_z = mov_z
   }
 
@@ -109,6 +111,7 @@ let updatePlayer = () => {
       while (Date.now() < end) {
         player_x = lerp(player_x, map_len_x / 2, 0.3)
         player_y += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
+        player_y_nowrap += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
         prev_mov_y = delayed_mov_y = player_speed + 0.4 // simulate high speed for other componets of the game
         mov_y = player_speed + 0.2 // simulate high speed for other componets of the game
         player_y = wrap_around(0, map_len_y - 1, player_y)

@@ -18,7 +18,7 @@ let drawApproachingRacer = () => {
 
     if (racer_y < player_y) return
 
-    let distance = abs(player_y - APPROACHING_RACER[1])
+    let distance = abs((player_y - 2) - APPROACHING_RACER[1])
 
     let size = ((1 * canvasHeight) / distance)|0
 
@@ -26,17 +26,25 @@ let drawApproachingRacer = () => {
 
     // range: -1..1
     let screen_x = (inv_lerp(
-        -map_len_x, map_len_x,
+        -(map_len_x - 2), (map_len_x - 2),
         racer_x - player_x,
     )-.5)*2
     // scale screen_x towards the screen center
     let dist_scale = remap(
-        -1, RENDER_DIST,
+        -2, RENDER_DIST,
         1, 0.2,
         distance
     ) * .8
     dist_scale = clamp(0, 2, dist_scale)
     screen_x *= dist_scale
+
+    let screen_y = screen_y_at_distance(distance) - 6
+    // This goes way down when it gets too close. Fix it roughly
+    if (screen_y > 120) {
+        screen_y = lerp(screen_y, 120, .12)
+        // Additionally, code some distortion into the overtaken car
+        dist_scale = lerp(dist_scale, 1, .12)
+    }
 
     // range: 0..1
     screen_x = remap(-1, 1, 0, 1, screen_x)
@@ -46,11 +54,11 @@ let drawApproachingRacer = () => {
     // Draw the halo (?)
     ctx.filter = `blur(${size}px)`
     ctx.fillStyle = 'red'
-    ctx.fillRect((screen_x - (size/2)), screen_y_at_distance(distance) - (size/2), size, size)
+    ctx.fillRect((screen_x - (size/2)), screen_y - (size/2), size, size)
     ctx.filter = 'none'
 
     // Draw the hull
-    let hull = create_hull(screen_x, screen_y_at_distance(distance) - 6, 0, 0)
+    let hull = create_hull(screen_x, screen_y, 0, 0)
     let game_s = GAME_TIME / 1000
     move_hull(hull, sin(game_s / 2) * 1, sin(game_s * 3) * 4)
     shrink_hull(hull, dist_scale)

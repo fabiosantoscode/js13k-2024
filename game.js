@@ -12,6 +12,7 @@ let ctx = c.getContext('2d')
 let TAU = MATH.PI * 2
 let FORTY_FIVE_DEG_DIST = 0.6
 
+let FPS = 24
 let FRAME_DELTA_MS = 42 // ~1000/24
 let FOV = .8 // (1.5708 /* 90deg in radians */) / 2
 let CURRENT_FOV = FOV
@@ -27,7 +28,7 @@ let map = range(map_len_y, _=>range(map_len_x, (_, i)=>i==0||i==19))
 
 // The player has no collision while jumping and inside the track
 let player_should_collide = () =>
-  !(player_z > 2 && player_x > 2 && player_x < map_len_x - 2)
+  !(player_z > 3 && player_x > 2 && player_x < map_len_x - 2)
 
 let map_collide_point = (x, y) => {
   return map[y][x]
@@ -59,13 +60,31 @@ let generator = gen => (...a) => {
 }
 
 let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) => {
-  for (let i=0; i <= 1; i+=delta) {
+  /*for (let i=0; i <= 1; i+=delta) {
     let collides_here = map_collide_point(
       round(lerp(player_x, mov_x, i)),
       round(lerp(player_y, mov_y, i))
     );
     if (collides_here) return 1;
+  }*/
+  player_x = round(player_x)
+  player_y = round(player_y)
+  mov_x = round(mov_x)
+  mov_y = round(mov_y)
+
+  let dx = Math.sign(mov_x - player_x)
+  let dy = Math.sign(mov_y - player_y)
+
+  for (let x = player_x; x != mov_x; x += dx) {
+    for (let y = player_y; y != mov_y; y += dy) {
+      if (map_collide_point(x, y)) {
+        return 1;
+      }
+    }
   }
+
+  // we got there. collide there
+  return map_collide_point(mov_x, mov_y)
 }
 
 let vec_length = (x, y) => MATH.sqrt(x**2, y**2)
