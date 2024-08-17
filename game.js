@@ -1,7 +1,7 @@
 let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
 let MATH = Math;
-let {floor, ceil, sin, cos, abs, round, min, max, random} = MATH;
+let {floor, ceil, sin, cos, tan, abs, round, min, max, random} = MATH;
 let canvasHeight = 180
 let canvasWidth = 320
 let halfHeight = canvasHeight / 2
@@ -26,15 +26,13 @@ let map_len_x = 20
 let map_len_y = 1000
 let map = range(map_len_y, _=>range(map_len_x, (_, i)=>i==0||i==19))
 
-// The player has no collision while jumping and inside the track
-let player_should_collide = () =>
-  !(player_z > 3 && player_x > 2 && player_x < map_len_x - 2)
-
 let map_collide_point = (x, y) => {
   return map[y][x]
 };
 let makePromise = cb => new Promise(cb)
 let sleep = ms => makePromise(resolve => setTimeout(resolve, ms))
+let round_n = (num, n) => round(num / n) * n
+let floor_n = (num, n) => floor(num / n) * n
 let lerp = (from, to, much) => from + ((to - from) * much)
 let lerp_vec = ([from_x,from_y], [to_x,to_y], much) => [lerp(from_x, to_x, much), lerp(from_y, to_y, much)]
 let inv_lerp = (a, b, v) => (v - a) / (b - a)
@@ -54,10 +52,6 @@ let gradually_change = (value, inertia = 0.1) => {
     return value
   }
 }
-let generator = gen => (...a) => {
-  if (typeof gen === 'function') gen = gen(...a)
-  return gen.next()
-}
 
 let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) => {
   /*for (let i=0; i <= 1; i+=delta) {
@@ -72,11 +66,8 @@ let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) =>
   mov_x = round(mov_x)
   mov_y = round(mov_y)
 
-  let dx = Math.sign(mov_x - player_x)
-  let dy = Math.sign(mov_y - player_y)
-
-  for (let x = player_x; x != mov_x; x += dx) {
-    for (let y = player_y; y != mov_y; y += dy) {
+  for (let x = player_x; x != mov_x; x += MATH.sign(mov_x - player_x)) {
+    for (let y = player_y; y != mov_y; y += MATH.sign(mov_y - player_y)) {
       if (map_collide_point(x, y)) {
         return 1;
       }
@@ -92,6 +83,14 @@ let vec_rotate = (x, y, ang) => [
   x * cos(ang) - y * sin(ang),
   x * sin(ang) + y * cos(ang),
 ]
+let vec_rotate_around = (x, y, origin_x, origin_y, ang) => {
+  x -= origin_x
+  y -= origin_y
+
+  ;([x, y] = vec_rotate(x, y, ang))
+
+  return [x + origin_x, y + origin_y,]
+}
 
 // INPUT
 let keys = {}

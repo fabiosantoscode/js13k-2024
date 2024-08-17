@@ -3,15 +3,17 @@
 let CURRENT_TURN = 0
 let goal_nth_place = 13
 let goal_target_turn = 0
+let PLAYER_NO_COLLIDE = 0
 
 let APPROACHING_RACER
 
+let this_level_ends_at = 100
+let distance_till_next_level = () => this_level_ends_at - player_y_nowrap
 
 let ordinal = place => {
     let nx = ['th','st','nd','rd']
     return place+(nx[place] || nx[0])
 }
-let round_n = (num, n) => Math.round(num / n) * n
 let yield_time = function*(ms) {
     ms += Date.now()
     while (Date.now() < ms) yield;
@@ -76,21 +78,127 @@ let challenge_some_guy_in_front_of_you = function*() {
 
     APPROACHING_RACER = 0
 }
-let game_generator = function*() {
+let level_generator = function*(on_finish_cutscene) {
     let challenges =
         //[challenge_some_guy_in_front_of_you]
         [challenge_some_guy_in_front_of_you, challenge_jump, challenge_hard_turn]
 
-    for (let i = 0; i < 2; i++) {
-        yield * yield_space(90); // normalcy time (decrease to increase difficulty)
-        while (abs(player_y - map_len_y) < 400) {
-            yield; // free normalcy because the map will wrap around and can break math
+    while (1) {
+        // make sure we have space to do the challenge before the wrap around
+        if (abs(player_y - map_len_y) > 400) {
+            let chl = challenges[floor(random() * challenges.length)];
+            yield * chl();
+        }
+        
+        yield * yield_space(90); // meters of track which are between challenges (decrease to increase difficulty)
+        if (distance_till_next_level() < 200) {
+            break
+        }
+    }
+
+    // Finish level cutscene!
+
+    PLAYER_NO_COLLIDE++
+
+    let cutscene_fadeout = Date.now() + 2500
+    let cutscene_end = Date.now() + 4000
+    while (cutscene_end > Date.now()) {
+        let y = (player_y + RENDER_DIST + 10) | 0
+        let y_end = y + 10
+        while (y++ < y_end && y < map_len_y) {
+            map[y][0] = true
+            map[y][1] = true
+            map[y][2] = true
+            map[y][3] = true
+            map[y][4] = true
+            map[y][15] = true
+            map[y][16] = true
+            map[y][17] = true
+            map[y][18] = true
+            map[y][19] = true
         }
 
-        let chl = challenges[floor(random() * challenges.length)];
-        yield * chl();
+        let fadeout_point = abs(Date.now() - cutscene_fadeout);
+        let f_fadeout_point = round_n(fadeout_point, 250) / 1000
+        if (f_fadeout_point <= 1) {
+            if (on_finish_cutscene && f_fadeout_point == 0) {
+                COLOR_reset_all_colors()
+                on_finish_cutscene()
+                on_finish_cutscene = 0
+            }
+            c.style.opacity = f_fadeout_point
+            c.style.filter = `saturate(${lerp(100, 250, 1 - f_fadeout_point)}%)`
+        }
+
+        yield
     }
+
+    PLAYER_NO_COLLIDE--
 }
+let game_generator = (function*() {
+    yield; // Initial call, don't start yet
+
+    yield* level_generator(() => {
+        COLOR_stars = 'rgba(255,255,255,0.3)'
+        COLOR_sky_gradient_start = '#3377cc'
+        COLOR_sky_gradient_end = 'black'
+        COLOR_road_gradient_start = '#133'
+        COLOR_road_gradient_end = '#111'
+        COLOR_road_checkerboard = null
+        COLOR_tree_hue = 320
+        COLOR_wall_hue = 230
+        COLOR_abyss_color = 'rgba(180,50,150,.4)'
+        COLOR_player_brightness = 1.8
+    });
+
+    this_level_ends_at = player_y_nowrap + 200
+
+    yield* level_generator(() => {
+        // Macintosh plus
+        COLOR_stars = null
+        COLOR_sky_gradient_start = '#ff899c'
+        COLOR_sky_gradient_end = '#ff899c'
+        COLOR_road_gradient_start = null
+        COLOR_road_gradient_end = null
+        COLOR_road_checkerboard = ['#ff89a4', '#1b1a1c']
+        COLOR_road_grid = null
+        COLOR_tree_hue = 195.0
+        COLOR_wall_hue = 34.0
+        COLOR_tree_sat = .02
+        COLOR_wall_sat = .24
+        COLOR_tree_lum = .5
+        COLOR_wall_lum = .4
+        COLOR_abyss_color = '#e1a1fe'
+        COLOR_text_nth_place = '#87e7c0'
+        COLOR_player_brightness = 1.5
+    });
+
+    this_level_ends_at = player_y_nowrap + 200
+
+    yield* level_generator(() => {
+        COLOR_stars = 'red'
+        COLOR_road_gradient_start = 0
+        COLOR_road_gradient_end = 0
+        COLOR_road_grid = 'green'
+        COLOR_road_checkerboard = null
+        COLOR_tree_hue = 0
+        COLOR_tree_lum = .3
+        COLOR_wall_hue = 145
+        COLOR_wall_lum = .1
+        COLOR_player_brightness = 1.8
+    });
+
+    this_level_ends_at = player_y_nowrap + 200
+
+    yield* level_generator(() => {
+        // Full circle. Colors were set by COLOR_reset_all_colors
+        
+    });
+
+    this_level_ends_at = player_y_nowrap + 200
+
+    console.log('you finished the game')
+})()
 let warn = function*(w) {
     warning = w;
     yield* yield_time(800);
@@ -106,12 +214,10 @@ let screen_message_failure = function*(w) {
     yield* yield_time(800);
     failure = '';
 }
-let game_logic;
 let updateGoal = () => {
-    if ((game_logic ||= game_generator()).next().done) {
-        game_logic = 0;
-    }
+    game_generator.next();
 
+    // Maintain CURRENT_TURN
     CURRENT_TURN = lerp(CURRENT_TURN, goal_target_turn, 0.05);
     if (goal_target_turn == 0 && abs(CURRENT_TURN) < 0.05) CURRENT_TURN = 0;
 };
@@ -132,7 +238,7 @@ let drawGoal = () => {
         )
         : failure ? sin(GAME_TIME * 9) > 0 ? 'red' : 'purple'
         : success ? sin(GAME_TIME * 9) > 0 ? 'purple' : 'blue'
-        : 'green';
+        : COLOR_text_nth_place;
 
     ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + speed_info() + debug_info(), halfWidth, 20);
 };

@@ -75,9 +75,9 @@ let screen_y_at_distance = (z, distance) => {
 }
 let screen_x_at_distance = (x, distance) => {
    let angle = (CURRENT_TURN * .3) // TODO how does "spread" apply here
-   let relativeX = (x - player_x) * Math.cos(angle) + (distance * Math.sin(angle));
+   let relativeX = (x - player_x) * cos(angle) + (distance * sin(angle));
 
-   let screenX = ((2 * Math.tan(FOV / 2)) * (relativeX / distance));
+   let screenX = ((2 * tan(FOV / 2)) * (relativeX / distance));
 
    // The screen X position is calculated using the formula: sx = (2 * tan(FoV/2)) * ((x - origin) / distance)
    return ((screenX * canvasWidth) + halfWidth) | 0;
@@ -96,6 +96,49 @@ let get_distance_buffer = () => {
     return [x, hit_x, hit_y, distance]
   });
 }
+
+let COLOR_stars
+let COLOR_sky_gradient_start
+let COLOR_sky_gradient_end
+let COLOR_road_gradient_start
+let COLOR_road_gradient_end
+let COLOR_road_checkerboard
+let COLOR_road_grid
+let COLOR_tree_hue
+let COLOR_wall_hue
+let COLOR_tree_sat
+let COLOR_wall_sat
+let COLOR_tree_lum
+let COLOR_wall_lum
+let COLOR_abyss_color
+let COLOR_text_nth_place
+let COLOR_player_brightness
+let COLOR_reset_all_colors = () => {
+  COLOR_stars = 0
+  COLOR_sky_gradient_start = 'yellow'
+  COLOR_sky_gradient_end = 'purple'
+  COLOR_road_gradient_start = 'blue'
+  COLOR_road_gradient_end = 'purple'
+  COLOR_road_checkerboard = null
+  COLOR_road_grid = null
+  COLOR_tree_hue = 86
+  COLOR_wall_hue = 44
+  COLOR_tree_sat = .9
+  COLOR_wall_sat = .9
+  COLOR_tree_lum = 0
+  COLOR_wall_lum = 0
+  COLOR_abyss_color = 'rgba(255,200,200,.4)'
+  COLOR_text_nth_place = 'green'
+  COLOR_player_brightness = 1
+}
+let _unused = COLOR_reset_all_colors()
+
+let checkerboard_animation_step = 0
+
+let stars = range(2000, () => {
+  return [(random()-.5) * canvasWidth * 2, (random()-.5) * canvasWidth * 2]
+})
+let star_rotate_speed = -.002
 
 let abyss_x1_gradual = gradually_change()
 let abyss_w_gradual = gradually_change()
@@ -164,27 +207,122 @@ let drawWorld = () => {
     halfWidth, abyss_y1 + 100, 500,
     halfWidth, abyss_y1 + 100, 40
   )
-  sky_grad.addColorStop(0, 'yellow')
-  sky_grad.addColorStop(1, 'purple')
+  sky_grad.addColorStop(0, COLOR_sky_gradient_start)
+  sky_grad.addColorStop(1, COLOR_sky_gradient_end)
   ctx.fillStyle = sky_grad
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
+  // Draw stars
+  if (COLOR_stars) {
+    ctx.fillStyle = COLOR_stars
+    for (let star of stars) {
+      // Use this loop to rotate all stars as well to save space
+      let [x, y] = vec_rotate_around(...star, halfWidth / 2, halfHeight - 100, star_rotate_speed)
+
+      star[0] = x
+      star[1] = y
+
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + 1, y + 1)
+      ctx.lineTo(x + 0, y + 2)
+      ctx.lineTo(x - 1, y + 1)
+      ctx.lineTo(x, y)
+      ctx.fill()
+    }
+  }
+
   // Draw the road
-  let road_grad = ctx.createRadialGradient(
-    x_start || x_end, abyss_y1 +200, 70,
-    (x_start || x_end) - 10, abyss_y1 +200, 200,
-  )
-  road_grad.addColorStop(0, 'blue')
-  road_grad.addColorStop(1, 'purple')
-  ctx.fillStyle = road_grad
-  ctx.beginPath();
-  ctx.moveTo(abyss_x1, abyss_y1+abyss_h);
-  ctx.lineTo(x_end || x_start, abyss_y1+abyss_h);
-  ctx.lineTo(canvasWidth, (last_wall_bottom + last_wall_top) / 2);
-  ctx.lineTo(canvasWidth*2, canvasHeight * 2);
-  ctx.lineTo(-canvasWidth, canvasHeight * 2);
-  ctx.lineTo(0, (first_wall_bottom + first_wall_top) / 2);
-  ctx.fill();
+  if (COLOR_road_checkerboard) {
+    ctx.fillStyle = COLOR_road_checkerboard[0]
+    ctx.fillRect(0, abyss_y1 + abyss_h, canvasWidth, canvasHeight)
+
+    let is = 1
+    let step = 3
+    // Oscillate from 0 to [step] as we're moving forward
+    let y_moving = step - ((checkerboard_animation_step += 1) % step)
+    for (let y = (RENDER_DIST + 20) + y_moving; y > -2; y -= step) {
+      for (let x = 0; x < map_len_x; x += step) {
+        is = !is
+        ctx.fillStyle = COLOR_road_checkerboard[+is]
+        ctx.strokeStyle = 'red'
+
+        ctx.beginPath();
+        ctx.moveTo(
+          screen_x_at_distance(x, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x, y_moving + y + step),
+          screen_y_at_distance(-.5, y_moving + y + step),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x + step, y_moving + y + step),
+          screen_y_at_distance(-.5, y_moving + y + step),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x + step, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.fill()
+      }
+    }
+  } else if (COLOR_road_grid) {
+    ctx.fillRect(0, abyss_y1 + abyss_h, canvasWidth, canvasHeight)
+
+    let is = 1
+    let step = 3
+    let y_moving = step - ((checkerboard_animation_step += 1) % step)
+    for (let y = RENDER_DIST; y > 0; y -= step) {
+      for (let x = 0; x < map_len_x; x += step) {
+        is = !is
+        ctx.strokeStyle = COLOR_road_grid
+
+        ctx.beginPath();
+        ctx.moveTo(
+          screen_x_at_distance(x, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x, y_moving + y + step),
+          screen_y_at_distance(-.5, y_moving + y + step),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x + step, y_moving + y + step),
+          screen_y_at_distance(-.5, y_moving + y + step),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x + step, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.lineTo(
+          screen_x_at_distance(x, y_moving + y),
+          screen_y_at_distance(-.5, y_moving + y),
+        )
+        ctx.stroke()
+      }
+    }
+  } else {
+    let road_grad = ctx.createRadialGradient(
+      x_start || x_end, abyss_y1 +200, 70,
+      (x_start || x_end) - 10, abyss_y1 +200, 200,
+    )
+    road_grad.addColorStop(0, COLOR_road_gradient_start)
+    road_grad.addColorStop(1, COLOR_road_gradient_end)
+    ctx.fillStyle = road_grad
+    ctx.beginPath();
+    ctx.moveTo(abyss_x1, abyss_y1+abyss_h);
+    ctx.lineTo(x_end || x_start, abyss_y1+abyss_h);
+    ctx.lineTo(canvasWidth, (last_wall_bottom + last_wall_top) / 2);
+    ctx.lineTo(canvasWidth*2, canvasHeight * 2);
+    ctx.lineTo(-canvasWidth, canvasHeight * 2);
+    ctx.lineTo(0, (first_wall_bottom + first_wall_top) / 2);
+    ctx.fill();
+  }
 
   for (let [x, hit_x, distance, z_offset, height] of distance_buffer) {
     let how_far = inv_lerp(RENDER_DIST, 0, distance)
@@ -192,14 +330,14 @@ let drawWorld = () => {
 
     ctx.fillStyle =
       hit_x === 0 || hit_x === map_len_x - 1
-        ? `hsl(86deg, 90%, ${lerp(10,30,how_far)}%)`
-        : `hsl(44deg, 90%, ${lerp(10,30,how_far)}%)`
+        ? `hsl(${COLOR_tree_hue}deg, ${COLOR_tree_sat*100}%, ${(lerp(.1,.3,how_far) + COLOR_tree_lum) * 100}%)`
+        : `hsl(${COLOR_wall_hue}deg, ${COLOR_wall_sat*100}%, ${(lerp(.1,.3,how_far) + COLOR_wall_lum) * 100}%)`
     ctx.fillRect(x, z_offset, 4, height)
   }
   
   // Draw the abyss
   ctx.filter = 'blur(10px)'
-  ctx.fillStyle = 'rgba(255,200,200,.4)'
+  ctx.fillStyle = COLOR_abyss_color
   ctx.fillRect(
     abyss_x1_gradual(abyss_x1) - 5, 
     abyss_y1 - 5, 

@@ -20,6 +20,10 @@ let prev_mov_z = 0
 let frames_in_natural_z = 0
 let player_lunge_forward_as_a_result_of_hitting_a_wall_speed = 5
 
+// The player has no collision while jumping and inside the track
+let player_should_collide = () =>
+  !(player_z > 3 && player_x > 2 && player_x < map_len_x - 2) && !PLAYER_NO_COLLIDE
+
 let sideways_force_from_turns_gradual = gradually_change(0, 0.05)
 
 let updatePlayer = () => {
@@ -310,16 +314,12 @@ let drawPlayer = () => {
     }
   }
 
+  ctx.filter = `brightness(${COLOR_player_brightness})`
   move_hull(HULL, (canvasWidth / 20) * current_turn_gradual(CURRENT_TURN), abs(current_turn_gradual(CURRENT_TURN)) * -2)
   draw_hull(HULL, colorOverride||'green', colorOverride||'gray', colorOverride2||'purple', colorOverride||'black', 1.5)
 
-  // Move the hull backwards to draw the burninators behind it
-  let diff_x = clamp(-2, 2, (top[0] - tip[0]))
-  let diff_y = clamp(-2, 2, (top[1] - tip[1]))
-
-  move_hull(HULL, diff_x, diff_y)
-
   draw_hull_burninators(HULL, false, 1, burn_intensity)
+  ctx.filter = `none`
 }
 
 let current_turn_gradual = gradually_change(0, 0.01)
