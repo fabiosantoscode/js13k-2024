@@ -4,6 +4,9 @@ let CURRENT_TURN = 0
 let goal_nth_place = 13
 let goal_target_turn = 0
 let PLAYER_NO_COLLIDE = 0
+/** 0..1 */
+let DIFFICULTY = 0
+let LEVEL = 1
 
 let APPROACHING_RACER
 
@@ -154,6 +157,8 @@ let level_generator = function*(on_finish_cutscene, no_jump) {
 let game_generator = (function*() {
     yield; // Initial call, don't start yet
 
+    // DIFFICULTY = 0 - starts at zero
+
     this_level_ends_at = player_y_nowrap + 4000
 
     yield* level_generator(() => {
@@ -170,6 +175,8 @@ let game_generator = (function*() {
     });
 
     this_level_ends_at = player_y_nowrap + 4000
+    DIFFICULTY = 2 / 6
+    LEVEL = 2
 
     yield* level_generator(() => {
         // Macintosh plus
@@ -194,6 +201,8 @@ let game_generator = (function*() {
     });
 
     this_level_ends_at = player_y_nowrap + 4000
+    DIFFICULTY = 3 / 6
+    LEVEL = 3
 
     yield* level_generator(() => {
         COLOR_stars = 'red'
@@ -209,6 +218,8 @@ let game_generator = (function*() {
     });
 
     this_level_ends_at = player_y_nowrap + 4000
+    DIFFICULTY = 4 / 6
+    LEVEL = 4
 
     yield* level_generator(() => {
         // Rainbow road
@@ -228,6 +239,8 @@ let game_generator = (function*() {
     });
 
     this_level_ends_at = player_y_nowrap + 4000
+    DIFFICULTY = 5 / 6
+    LEVEL = 5
 
     yield* level_generator(() => {
         // Full circle. Colors were set by COLOR_reset_all_colors
@@ -235,6 +248,8 @@ let game_generator = (function*() {
     }, true);
 
     this_level_ends_at = player_y_nowrap + 4000
+    DIFFICULTY = 6 / 6
+    LEVEL = 6
 
     // TODO yield* ending()
 })()
@@ -260,12 +275,9 @@ let updateGoal = () => {
     CURRENT_TURN = lerp(CURRENT_TURN, goal_target_turn, 0.05);
     if (goal_target_turn == 0 && abs(CURRENT_TURN) < 0.05) CURRENT_TURN = 0;
 };
-let speed_info = () => {
-    return ` ${(prev_mov_y * FPS).toFixed(2)}`;
-};
 let debug_info = () => {
     if (self.env === 'production') return '';
-    return ` ${player_y.toFixed(2)}`;
+    return ` `;
 };
 let warning = '';
 let success = '';
@@ -279,5 +291,5 @@ let drawGoal = () => {
         : success ? sin(GAME_TIME * 9) > 0 ? 'purple' : 'blue'
         : COLOR_text_nth_place;
 
-    ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + speed_info() + debug_info(), halfWidth, 20);
+    ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + debug_info(), halfWidth, 20);
 };

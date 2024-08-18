@@ -13,8 +13,8 @@ let updateWorld = () => {
 
       if (COLOR_wall_randomness_biome == 9) continue // rainbow road - no wall
       if (COLOR_wall_randomness_biome == 8) {
-        map[y][1] = y % 4 !== 0
-        map[y][map_len_x - 1] = y % 4 !== 0
+        map[y][1] = y % 8 < 3
+        map[y][map_len_x - 2] = y % 8 < 3
         // macintosh plus
         continue
       }

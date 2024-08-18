@@ -78,6 +78,8 @@ let updatePlayer = () => {
 
   let sideways_force_from_turns = sideways_force_from_turns_gradual(CURRENT_TURN * .8)
   mov_x -= sideways_force_from_turns * prev_mov_y
+  let difficulty_speed_increase = lerp(1, 2, DIFFICULTY);
+  mov_y *= difficulty_speed_increase
 
   // try new position to see how we feel
   mov_x = (mov_x * player_speed) + player_x
