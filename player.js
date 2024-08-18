@@ -22,7 +22,7 @@ let player_lunge_forward_as_a_result_of_hitting_a_wall_speed = 5
 
 // The player has no collision while jumping and inside the track
 let player_should_collide = () =>
-  !(player_z > 3 && player_x > 2 && player_x < map_len_x - 2) && !PLAYER_NO_COLLIDE
+  !(player_z > 6 && player_x > 2 && player_x < map_len_x - 2) && !PLAYER_NO_COLLIDE
 
 let sideways_force_from_turns_gradual = gradually_change(0, 0.05)
 

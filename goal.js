@@ -7,7 +7,7 @@ let PLAYER_NO_COLLIDE = 0
 
 let APPROACHING_RACER
 
-let this_level_ends_at = 100
+let this_level_ends_at = 0
 let distance_till_next_level = () => this_level_ends_at - player_y_nowrap
 
 let ordinal = place => {
@@ -28,7 +28,7 @@ let challenge_hard_turn = function*() {
     let turn_towards = random() > 0.5 ? 1 : -1
     yield* warn(turn_towards < 0 ? 'HARD LEFT' : 'HARD RIGHT')
     goal_target_turn = turn_towards
-    yield* yield_space(200)
+    yield* yield_space(100)
     goal_target_turn = 0
 }
 let challenge_jump = function*() {
@@ -52,12 +52,12 @@ let challenge_some_guy_in_front_of_you = function*() {
     APPROACHING_RACER = [player_x > 10 ? 7 : 13, player_y + RENDER_DIST + 2, 1]
 
     // Another pilot comes, and you have to hit them in the back to make sure you remain in 13th place
-    yield* warn(`YOU APPROACH THE ${ordinal(goal_nth_place - 1)} CONTESTANT`)
+    yield* warn(`${ordinal(goal_nth_place - 1)} CONTESTANT`)
     let cancel_at = Date.now() + 8_000
     while (1) {
         // CANCEL
         if (player_y > 900 || (Date.now() > cancel_at)) {
-            console.log('canceled')
+            // Cancel this (just to avoid infinite loop and math issues due to wrapping)
             break
         }
         // SUCCEED
@@ -78,14 +78,30 @@ let challenge_some_guy_in_front_of_you = function*() {
 
     APPROACHING_RACER = 0
 }
-let level_generator = function*(on_finish_cutscene) {
+let DEBUG_skip_to_level
+if (self.env !== 'production') {
+    let l = +new URLSearchParams(location.search).get('level')
+    if (l) DEBUG_skip_to_level = l
+}
+let level_generator = function*(on_finish_cutscene, no_jump) {
+    if (self.env !== 'production') {
+        if (DEBUG_skip_to_level > 1) {
+            DEBUG_skip_to_level--
+            COLOR_reset_all_colors()
+            on_finish_cutscene && on_finish_cutscene()
+            return
+        }
+    }
+
     let challenges =
         //[challenge_some_guy_in_front_of_you]
-        [challenge_some_guy_in_front_of_you, challenge_jump, challenge_hard_turn]
+        [challenge_some_guy_in_front_of_you, challenge_hard_turn]
+
+    if (!no_jump) challenges.push(challenge_jump)
 
     while (1) {
         // make sure we have space to do the challenge before the wrap around
-        if (abs(player_y - map_len_y) > 400) {
+        if (abs(player_y - map_len_y) > map_len_y - 600) {
             let chl = challenges[floor(random() * challenges.length)];
             yield * chl();
         }
@@ -138,6 +154,8 @@ let level_generator = function*(on_finish_cutscene) {
 let game_generator = (function*() {
     yield; // Initial call, don't start yet
 
+    this_level_ends_at = player_y_nowrap + 4000
+
     yield* level_generator(() => {
         COLOR_stars = 'rgba(255,255,255,0.3)'
         COLOR_sky_gradient_start = '#3377cc'
@@ -151,13 +169,14 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
     });
 
-    this_level_ends_at = player_y_nowrap + 200
+    this_level_ends_at = player_y_nowrap + 4000
 
     yield* level_generator(() => {
         // Macintosh plus
         COLOR_stars = null
         COLOR_sky_gradient_start = '#ff899c'
         COLOR_sky_gradient_end = '#ff899c'
+        COLOR_sky_shapes = 1
         COLOR_road_gradient_start = null
         COLOR_road_gradient_end = null
         COLOR_road_checkerboard = ['#ff89a4', '#1b1a1c']
@@ -171,9 +190,10 @@ let game_generator = (function*() {
         COLOR_abyss_color = '#e1a1fe'
         COLOR_text_nth_place = '#87e7c0'
         COLOR_player_brightness = 1.5
+        COLOR_wall_randomness_biome = 8
     });
 
-    this_level_ends_at = player_y_nowrap + 200
+    this_level_ends_at = player_y_nowrap + 4000
 
     yield* level_generator(() => {
         COLOR_stars = 'red'
@@ -188,16 +208,35 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
     });
 
-    this_level_ends_at = player_y_nowrap + 200
+    this_level_ends_at = player_y_nowrap + 4000
+
+    yield* level_generator(() => {
+        // Rainbow road
+        COLOR_moon = '#ddd'
+        COLOR_road_rainbow = ['#c83898', '#c89058', '#c8c020', '#08c828', '#18c0d8', '#6060e8', '#b008e8']
+        COLOR_stars = 'white'
+        COLOR_sky_gradient_end = 'black'
+        COLOR_sky_gradient_start = 'black'
+        COLOR_wall_sat = 86
+        COLOR_wall_lum = .2
+        COLOR_wall_hue = 250
+        COLOR_tree_sat = 0
+        COLOR_tree_lum = .1
+        COLOR_player_brightness = 2
+        COLOR_wall_hidden = 1
+        COLOR_wall_randomness_biome = 9
+    });
+
+    this_level_ends_at = player_y_nowrap + 4000
 
     yield* level_generator(() => {
         // Full circle. Colors were set by COLOR_reset_all_colors
         
-    });
+    }, true);
 
-    this_level_ends_at = player_y_nowrap + 200
+    this_level_ends_at = player_y_nowrap + 4000
 
-    console.log('you finished the game')
+    // TODO yield* ending()
 })()
 let warn = function*(w) {
     warning = w;
