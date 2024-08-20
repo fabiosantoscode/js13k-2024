@@ -1,3 +1,9 @@
+// Music synthesizer (`playTabs`) and tabs
+// Tab format:
+// whitespace is irrelevant
+// pauses: _x4 (pause 4x); _ (pause 1x)
+// notes:  f#x2 (play f# 2x); f# (play f# 1x)
+
 let audioCtx
 
 let drumTempo = (60_000 / (120 * 2)) / 2;
@@ -94,15 +100,11 @@ let tabPlayer = function*([frequency, gain], tempo, mod, tab) {
   }
 }
 
-// Tab format:
-// whitespace is irrelevant
-// pauses: _x4 (pause 4x); _ (pause 1x)
-// notes:  f#x2 (play f# 2x); f# (play f# 1x)
+/*
+// mechanical turk fight music
 let motif = 'a3x4 c4x4 b3x4 a#3x4';
 let response = 'a3x2 _ a3';
 
-/*
-// mechanical turk fight music
 let tab =
 `${motif} ${response} _x4 ${response} _x4
 a3x4 c4x4 d#4x4 g3x4 ${response} _x4 ${response} _x4
