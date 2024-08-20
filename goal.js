@@ -7,6 +7,7 @@ let PLAYER_NO_COLLIDE = 0
 /** 0..1 */
 let DIFFICULTY = 0
 let LEVEL = 1
+let ENDING_CUTSCENE = 0
 
 let APPROACHING_RACER
 
@@ -14,8 +15,12 @@ let this_level_ends_at = 0
 let distance_till_next_level = () => this_level_ends_at - player_y_nowrap
 
 let ordinal = place => {
-    let nx = ['th','st','nd','rd']
-    return place+(nx[place] || nx[0])
+    if (ENDING_CUTSCENE) {
+        return ''
+    } else {
+        let nx = ['th','st','nd','rd']
+        return place+(nx[place] || nx[0])
+    }
 }
 let yield_time = function*(ms) {
     ms += Date.now()
@@ -247,9 +252,35 @@ let game_generator = (function*() {
         
     }, true);
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = Infinity
     DIFFICULTY = 6 / 6
     LEVEL = 6
+
+    ENDING_CUTSCENE++
+    if (goal_nth_place === 13) {
+        yield* screen_message_success('Congratulations', 4000);
+        yield* yield_time(400);
+        yield* screen_message_success('You have Finish In 13th Place', 4000);
+        yield* yield_time(400);
+        yield* screen_message_success('You have failed Successfully', 4000);
+        yield* yield_time(400);
+        yield* screen_message_success('You have worked hard and');
+        yield* yield_time(400);
+        yield* screen_message_success('now the quadrillionaire', 4000);
+        yield* yield_time(400);
+        yield* screen_message_success('Has bought another space yacht', 4000);
+        yield* yield_time(400);
+    } else {
+        yield* screen_message_failure('Unfortunately', 4000);
+        yield* yield_time(400);
+        yield* screen_message_failure('You have failed by succeeding', 4000);
+        yield* yield_time(400);
+        yield* screen_message_failure('next time', 4000);
+        yield* yield_time(400);
+        yield* screen_message_failure('Please Finish In 13th Place', 4000);
+        yield* yield_time(400);
+    }
+    ENDING_CUTSCENE--
 
     // TODO yield* ending()
 })()
@@ -258,14 +289,14 @@ let warn = function*(w) {
     yield* yield_time(800);
     warning = '';
 }
-let screen_message_success = function*(w) {
+let screen_message_success = function*(w, time) {
     success = w;
-    yield* yield_time(800);
+    yield* yield_time(time||800);
     success = '';
 }
-let screen_message_failure = function*(w) {
+let screen_message_failure = function*(w, time) {
     failure = w;
-    yield* yield_time(800);
+    yield* yield_time(time||800);
     failure = '';
 }
 let updateGoal = () => {
@@ -283,6 +314,9 @@ let warning = '';
 let success = '';
 let failure = '';
 let drawGoal = () => {
+    if (ENDING_CUTSCENE) {
+        warning = '';
+    }
     ctx.fillStyle =
         warning ? (
             sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow'

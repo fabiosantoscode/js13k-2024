@@ -4,17 +4,17 @@
 <style>
 canvas{x-image-rendering:-moz-crisp-edges;image-rendering:pixelated;width:100%;height:auto;border:0.30vw solid purple}
 *{padding:0;margin:0;user-select:none}
-html,body,#sc{height:100%;background:black;color:purple;line-height:1}
-p,h1{margin:1rem}
-strong{color:rgb(168,68,168)}
+html,body,#sc{background:black;color:purple;line-height:1}
+p,h1{margin:1rem;font-size:20px;text-align:center}
 h1{color:white}
+strong{color:rgb(168,68,168)}
 #sc{display:flex;justify-content:center;align-items:center}
-button{width:30%;height:35px;border:none;background:white;display:inline-block;padding:1em;min-width:0}
-[keys]{position:fixed;bottom:50px;width:20vw;min-width:300px}
+button{border:none;background:white;display:inline-block;padding:1em;min-width:0}
+[keys]{position:fixed;bottom:50px}
 [left]{text-align:left;left:50px}
 [right]{text-align:right;right:50px}
-@media(max-width:600px){button{width:50px}}
-@media(min-aspect-ratio:320/180){canvas{height:100%;width:auto;justify-self:center}}
+@media(max-width:600px){}
+@media(min-aspect-ratio:320/180){canvas{height:100vh;width:auto;justify-self:center}}
 </style>
 <title>Please Finish In 13th Place</title>
 <!-- story -->
@@ -25,6 +25,7 @@ button{width:30%;height:35px;border:none;background:white;display:inline-block;p
 <div keys right><button key=" ">jump</button>
 <button key=w>accelerate</button></div>
 </div>
+<p><br>
 <!-- snip -->
 <script src="game.js"></script>
 <script src="world.js"></script>
