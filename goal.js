@@ -160,11 +160,17 @@ let level_generator = function*(on_finish_cutscene, no_jump) {
     PLAYER_NO_COLLIDE--
 }
 let game_generator = (function*() {
-    yield; // Initial call, don't start yet
+    // yield; // Don't start yet (`game_generator` is called immediately)
+
+    // Make sure we are ready
+    yield* yield_space(100);
+
+    yield* screen_message_success('Press A/D to move', 4000);
+    yield* screen_message_success('Or tap buttons below', 4000);
 
     // DIFFICULTY = 0 - starts at zero
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = player_y_nowrap + 3000
 
     yield* level_generator(() => {
         COLOR_stars = 'rgba(255,255,255,0.3)'
@@ -179,7 +185,7 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
     });
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = player_y_nowrap + 3000
     DIFFICULTY = 2 / 6
     LEVEL = 2
 
@@ -205,7 +211,7 @@ let game_generator = (function*() {
         COLOR_wall_randomness_biome = 8
     });
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = player_y_nowrap + 3000
     DIFFICULTY = 3 / 6
     LEVEL = 3
 
@@ -222,7 +228,7 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
     });
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = player_y_nowrap + 3000
     DIFFICULTY = 4 / 6
     LEVEL = 4
 
@@ -243,7 +249,7 @@ let game_generator = (function*() {
         COLOR_wall_randomness_biome = 9
     });
 
-    this_level_ends_at = player_y_nowrap + 4000
+    this_level_ends_at = player_y_nowrap + 3000
     DIFFICULTY = 5 / 6
     LEVEL = 5
 
@@ -269,6 +275,21 @@ let game_generator = (function*() {
         yield* screen_message_success('now the quadrillionaire', 4000);
         yield* yield_time(400);
         yield* screen_message_success('Has bought another space yacht', 4000);
+        yield* yield_time(400);
+    } else if (goal_nth_place === 1) {
+        yield* screen_message_success("Congratulations", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("You have Finish In 1th Place", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("You have failed by Succeeding", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("You have worked hard and", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("You are in racing hall of fame", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("And also DEAD ...", 4000);
+        yield* yield_time(400);
+        yield* screen_message_success("Should have Finish In 13th Place", 4000);
         yield* yield_time(400);
     } else {
         yield* screen_message_failure('Unfortunately', 4000);

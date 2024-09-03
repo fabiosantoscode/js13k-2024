@@ -247,39 +247,39 @@ let drawWorld = () => {
         [300, 682, 110, 1, 1],
       ]) {
         let seconds_varied = GAME_TIME_SECS + (x + z)
-        let scale = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv2
-        let scale_y = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv * .7
-
-        x += Math.sin(seconds_varied)
+        let scale = ((20 + cos(seconds_varied) + cos(y)) * 100) / y * inv2
+        let scale_y = ((20 + cos(seconds_varied) + cos(y)) * 100) / y * inv * .7
+        
+        x += sin(seconds_varied)
         x = screen_x_at_distance(x, y)
         y = screen_y_at_distance(z, y)
         // top
         ctx.fillStyle = '#fff'
         ctx.beginPath()
-        ctx.moveTo((x + 0 * scale), (y + -2 * scale_y))
-        ctx.lineTo((x - 1 * scale), ((y + -1 * scale_y)))
-        ctx.lineTo((x + 0 * scale), ((y + 0 * scale_y)))
-        ctx.lineTo((x + 1 * scale), ((y + -1 * scale_y)))
-        ctx.lineTo((x + 0 * scale), (y + -2 * scale_y))
+        ctx.moveTo(round(x + 0 * scale), round(y + -2 * scale_y))
+        ctx.lineTo(round(x - 1 * scale), round((y + -1 * scale_y)))
+        ctx.lineTo(round(x + 0 * scale), round((y + 0 * scale_y)))
+        ctx.lineTo(round(x + 1 * scale), round((y + -1 * scale_y)))
+        ctx.lineTo(round(x + 0 * scale), round(y + -2 * scale_y))
         ctx.fill();
         // left
         ctx.fillStyle = '#c3c3c3'
         ctx.beginPath()
-        ctx.moveTo((x - 1 * scale), (y + -1 * scale_y))
-        ctx.lineTo((x - 1 * scale), (y + 1 * scale_y))
-        ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
-        ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
-        ctx.lineTo((x - 1 * scale), (y + -1 * scale_y))
+        ctx.moveTo(round(x - 1 * scale), round(y + -1 * scale_y))
+        ctx.lineTo(round(x - 1 * scale), round(y + 1 * scale_y))
+        ctx.lineTo(round(x + 0 * scale), round(y + 2 * scale_y))
+        ctx.lineTo(round(x + 0 * scale), round(y + 0 * scale_y))
+        ctx.lineTo(round(x - 1 * scale), round(y + -1 * scale_y))
         ctx.fill();
         // right
         ctx.fillStyle = '#7f7f7f'
         ctx.beginPath()
-        ctx.moveTo((x + 0 * scale), (y + 0 * scale_y))
-        ctx.lineTo((x + 1 * scale), (y + -1 * scale_y))
-        ctx.lineTo((x + 1 * scale), (y + 1 * scale_y))
-        ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
-        ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
-        ctx.fill();
+        ctx.moveTo(round(x + 0 * scale), round(y + 0 * scale_y))
+        ctx.lineTo(round(x + 1 * scale), round(y + -1 * scale_y))
+        ctx.lineTo(round(x + 1 * scale), round(y + 1 * scale_y))
+        ctx.lineTo(round(x + 0 * scale), round(y + 2 * scale_y))
+        ctx.lineTo(round(x + 0 * scale), round(y + 0 * scale_y))
+        ctx.fill();  
       }
     }
 
@@ -322,6 +322,7 @@ let drawWorld = () => {
     }
   })
 
+  ctx.globalAlpha = 0.0
   // Draw the road
   if (COLOR_road_rainbow) {
     ctx.fillStyle = 'black'
@@ -332,6 +333,7 @@ let drawWorld = () => {
     // Oscillate from 0 to [step] as we're moving forward
     let y_moving = 0 //step - (player_y_nowrap % step) //step - ((checkerboard_animation_step += 1) % step)
     for (let y = (RENDER_DIST + 20) + y_moving; y > -2; y -= step) {
+      ctx.globalAlpha += .05
       for (let x = 0; x < 1; x += step) {
         is++
         ctx.fillStyle = COLOR_road_rainbow[+is % COLOR_road_rainbow.length]
@@ -370,6 +372,7 @@ let drawWorld = () => {
     // Oscillate from 0 to [step] as we're moving forward
     let y_moving = step - ((checkerboard_animation_step += 1) % step)
     for (let y = (RENDER_DIST + 20) + y_moving; y > -2; y -= step) {
+      ctx.globalAlpha += .05
       for (let x = 0; x < map_len_x; x += step) {
         is = !is
         ctx.fillStyle = COLOR_road_checkerboard[+is]
@@ -410,6 +413,7 @@ let drawWorld = () => {
     let step = 3
     let y_moving = step - ((checkerboard_animation_step += 1) % step)
     for (let y = RENDER_DIST; y > 0; y -= step) {
+      ctx.globalAlpha += .05
       for (let x = 0; x < map_len_x; x += step) {
         is = !is
         ctx.strokeStyle = COLOR_road_grid
@@ -455,6 +459,8 @@ let drawWorld = () => {
     ctx.lineTo(0, (first_wall_bottom + first_wall_top) / 2);
     ctx.fill();
   }
+
+  ctx.globalAlpha = 1
 
   if (!COLOR_wall_hidden) {
     let mid_buffer = round(distance_buffer.length / 2)

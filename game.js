@@ -1,7 +1,6 @@
 let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
-let MATH = Math;
-let {floor, ceil, sin, cos, tan, abs, round, min, max, random} = MATH;
+let {floor, ceil, round, sin, cos, tan, abs, min, max, random} = Math;
 let canvasHeight = 180
 let canvasWidth = 320
 let halfHeight = canvasHeight / 2
@@ -9,7 +8,7 @@ let halfWidth = canvasWidth / 2
 /** @type {CanvasRenderingContext2D} */
 let ctx = c.getContext('2d')
 
-let TAU = MATH.PI * 2
+let TAU = 6.3 // ~ Math.PI * 2
 let FORTY_FIVE_DEG_DIST = 0.6
 
 let FPS = 24
@@ -64,7 +63,7 @@ let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) =>
   }
 }
 
-let vec_length = (x, y) => MATH.sqrt(x**2, y**2)
+let vec_length = (x, y) => Math.sqrt(x**2, y**2)
 let vec_rotate = (x, y, ang) => [
   x * cos(ang) - y * sin(ang),
   x * sin(ang) + y * cos(ang),
