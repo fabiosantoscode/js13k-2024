@@ -322,12 +322,9 @@ let drawWorld = () => {
     }
   })
 
-  ctx.globalAlpha = 0.0
   // Draw the road
   if (COLOR_road_rainbow) {
-    ctx.fillStyle = 'black'
-    ctx.fillRect(0, screen_y_at_distance(-.5, RENDER_DIST + 20), canvasWidth, canvasHeight)
-
+    ctx.globalAlpha = 0.0
     let step = 5
     let is = COLOR_road_rainbow.length - (floor(player_y_nowrap / step) % COLOR_road_rainbow.length)
     // Oscillate from 0 to [step] as we're moving forward
@@ -366,6 +363,7 @@ let drawWorld = () => {
   } else if (COLOR_road_checkerboard) {
     ctx.fillStyle = COLOR_road_checkerboard[0]
     ctx.fillRect(0, abyss_y1 + abyss_h, canvasWidth, canvasHeight)
+    ctx.globalAlpha = 0.0
 
     let is = 1
     let step = 3
@@ -408,6 +406,7 @@ let drawWorld = () => {
       ctx.fillStyle = COLOR_stars
     }
     ctx.fillRect(0, abyss_y1 + abyss_h, canvasWidth, canvasHeight)
+    ctx.globalAlpha = 0.0
 
     let is = 1
     let step = 3

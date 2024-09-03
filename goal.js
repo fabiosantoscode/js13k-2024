@@ -163,10 +163,13 @@ let game_generator = (function*() {
     // yield; // Don't start yet (`game_generator` is called immediately)
 
     // Make sure we are ready
-    yield* yield_space(100);
+    if (self.env === 'production') {
+      yield* yield_space(100);
 
-    yield* screen_message_success('Press A/D to move', 4000);
-    yield* screen_message_success('Or tap buttons below', 4000);
+      yield* screen_message_success('Press A/D to move', 4000);
+      yield* screen_message_success('Or tap buttons below', 4000);
+      yield* screen_message_success('Please Finish In 13th Place', 4000);
+    }
 
     // DIFFICULTY = 0 - starts at zero
 
