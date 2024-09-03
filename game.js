@@ -116,6 +116,7 @@ let update = () => {
 let iter_step = 2
 let draw = () => {
   ctx.lineJoin = 'round'
+  drawMultiPhase()
   drawWorld()
   drawApproachingRacer()
   drawPlayer()
@@ -123,9 +124,12 @@ let draw = () => {
 }
 
 let doFrame = () => {
+  let start = Date.now()
   update()
   draw()
-  setTimeout(doFrame, FRAME_DELTA_MS)
+  // Our update(); draw(); produced time, let's offset it
+  let till_next_frame = max(0, FRAME_DELTA_MS - (Date.now() - start))
+  setTimeout(doFrame, till_next_frame)
 }
 
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION

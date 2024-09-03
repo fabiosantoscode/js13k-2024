@@ -160,8 +160,8 @@ let stars = range(2000, () => {
 })
 let star_rotate_speed = -.002
 
-let abyss_x1_gradual = gradually_change()
-let abyss_w_gradual = gradually_change()
+let abyss_x1_gradual = gradually_change(0, 0.2)
+let abyss_w_gradual = gradually_change(0, 0.2)
 let drawWorld = () => {
   // Change FOV according to speed
   let target_fov =
@@ -222,7 +222,6 @@ let drawWorld = () => {
   let abyss_x1 = x_start
   let abyss_y1 = (z_center - (abyss_h/2))|0
 
-  // Draw the sky
   let sky_grad = ctx.createRadialGradient(
     halfWidth, abyss_y1 + 100, 500,
     halfWidth, abyss_y1 + 100, 40
@@ -232,93 +231,96 @@ let drawWorld = () => {
   ctx.fillStyle = sky_grad
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-  if (COLOR_sky_shapes) {
-    for (let [x, y, z, inv, inv2] of [
-      [-50, 50, 11, -1, 1],
-      [-50, 130, 40, 1, 1],
-      [-30, 110, 50, 1, -1],
-      [-20, 150, 11, -1, 1],
-      [54, 250, 10, -1, 1],
-      [-50, 550, 11, -1, -1],
-      [50, 450, 80, 1, -1],
-      [50, 682, 80, 1, 1],
-      [15, 40, 28, 1, -1],
-      [300, 682, 110, 1, 1],
-    ]) {
-      let seconds_varied = GAME_TIME_SECS + (x + z)
-      let scale = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv2
-      let scale_y = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv * .7
-      
-      x += Math.sin(seconds_varied)
-      x = screen_x_at_distance(x, y)
-      y = screen_y_at_distance(z, y)
-      // top
-      ctx.fillStyle = '#fff'
-      ctx.beginPath()
-      ctx.moveTo((x + 0 * scale), (y + -2 * scale_y))
-      ctx.lineTo((x - 1 * scale), ((y + -1 * scale_y)))
-      ctx.lineTo((x + 0 * scale), ((y + 0 * scale_y)))
-      ctx.lineTo((x + 1 * scale), ((y + -1 * scale_y)))
-      ctx.lineTo((x + 0 * scale), (y + -2 * scale_y))
-      ctx.fill();
-      // left
-      ctx.fillStyle = '#c3c3c3'
-      ctx.beginPath()
-      ctx.moveTo((x - 1 * scale), (y + -1 * scale_y))
-      ctx.lineTo((x - 1 * scale), (y + 1 * scale_y))
-      ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
-      ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
-      ctx.lineTo((x - 1 * scale), (y + -1 * scale_y))
-      ctx.fill();
-      // right
-      ctx.fillStyle = '#7f7f7f'
-      ctx.beginPath()
-      ctx.moveTo((x + 0 * scale), (y + 0 * scale_y))
-      ctx.lineTo((x + 1 * scale), (y + -1 * scale_y))
-      ctx.lineTo((x + 1 * scale), (y + 1 * scale_y))
-      ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
-      ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
-      ctx.fill();
+  // Draw the sky
+  if_multiphase_draw(PHASE_SKY, () => {
+    if (COLOR_sky_shapes) {
+      for (let [x, y, z, inv, inv2] of [
+        [-50, 50, 11, -1, 1],
+        [-50, 130, 40, 1, 1],
+        [-30, 110, 50, 1, -1],
+        [-20, 150, 11, -1, 1],
+        [54, 250, 10, -1, 1],
+        [-50, 550, 11, -1, -1],
+        [50, 450, 80, 1, -1],
+        [50, 682, 80, 1, 1],
+        [15, 40, 28, 1, -1],
+        [300, 682, 110, 1, 1],
+      ]) {
+        let seconds_varied = GAME_TIME_SECS + (x + z)
+        let scale = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv2
+        let scale_y = ((20 + Math.cos(seconds_varied) + Math.cos(y)) * 100) / y * inv * .7
+
+        x += Math.sin(seconds_varied)
+        x = screen_x_at_distance(x, y)
+        y = screen_y_at_distance(z, y)
+        // top
+        ctx.fillStyle = '#fff'
+        ctx.beginPath()
+        ctx.moveTo((x + 0 * scale), (y + -2 * scale_y))
+        ctx.lineTo((x - 1 * scale), ((y + -1 * scale_y)))
+        ctx.lineTo((x + 0 * scale), ((y + 0 * scale_y)))
+        ctx.lineTo((x + 1 * scale), ((y + -1 * scale_y)))
+        ctx.lineTo((x + 0 * scale), (y + -2 * scale_y))
+        ctx.fill();
+        // left
+        ctx.fillStyle = '#c3c3c3'
+        ctx.beginPath()
+        ctx.moveTo((x - 1 * scale), (y + -1 * scale_y))
+        ctx.lineTo((x - 1 * scale), (y + 1 * scale_y))
+        ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
+        ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
+        ctx.lineTo((x - 1 * scale), (y + -1 * scale_y))
+        ctx.fill();
+        // right
+        ctx.fillStyle = '#7f7f7f'
+        ctx.beginPath()
+        ctx.moveTo((x + 0 * scale), (y + 0 * scale_y))
+        ctx.lineTo((x + 1 * scale), (y + -1 * scale_y))
+        ctx.lineTo((x + 1 * scale), (y + 1 * scale_y))
+        ctx.lineTo((x + 0 * scale), (y + 2 * scale_y))
+        ctx.lineTo((x + 0 * scale), (y + 0 * scale_y))
+        ctx.fill();
+      }
     }
-  }
 
-  // Draw stars
-  if (COLOR_stars) {
-    ctx.fillStyle = COLOR_stars
-    for (let star of stars) {
-      // Use this loop to rotate all stars as well to save space
-      let [x, y] = vec_rotate_around(...star, halfWidth / 2, halfHeight - 100, star_rotate_speed)
+    // Draw stars
+    if (COLOR_stars) {
+      ctx.fillStyle = COLOR_stars
+      for (let star of stars) {
+        // Use this loop to rotate all stars as well to save space
+        let [x, y] = vec_rotate_around(...star, halfWidth / 2, halfHeight - 100, star_rotate_speed)
 
-      star[0] = x
-      star[1] = y
+        star[0] = x
+        star[1] = y
 
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(x + 1, y + 1)
+        ctx.lineTo(x + 0, y + 2)
+        ctx.lineTo(x - 1, y + 1)
+        ctx.lineTo(x, y)
+        ctx.fill()
+      }
+    }
+
+    if (COLOR_moon) {
+      COLOR_moon_progress += FRAME_DELTA_S
+
+      // ctx.moveTo(halfWidth, halfHeight)
+      let y = remap(0, 20, halfHeight, halfHeight / 2, COLOR_moon_progress);
+      ctx.fillStyle = 'white'
+      ctx.filter = 'blur(10px)'
       ctx.beginPath()
-      ctx.moveTo(x, y)
-      ctx.lineTo(x + 1, y + 1)
-      ctx.lineTo(x + 0, y + 2)
-      ctx.lineTo(x - 1, y + 1)
-      ctx.lineTo(x, y)
+      ctx.arc(halfWidth, y, 40, 0, TAU)
+      ctx.fill()
+      ctx.filter = 'none'
+
+      ctx.fillStyle = COLOR_moon
+      ctx.beginPath()
+      ctx.arc(halfWidth, y, 40, 0, TAU)
       ctx.fill()
     }
-  }
-
-  if (COLOR_moon) {
-    COLOR_moon_progress += FRAME_DELTA_S
-
-    // ctx.moveTo(halfWidth, halfHeight)
-    let y = remap(0, 20, halfHeight, halfHeight / 2, COLOR_moon_progress);
-    ctx.fillStyle = 'white'
-    ctx.filter = 'blur(30px)'
-    ctx.beginPath()
-    ctx.arc(halfWidth, y, 40, 0, TAU)
-    ctx.fill()
-    ctx.filter = 'none'
-
-    ctx.fillStyle = COLOR_moon
-    ctx.beginPath()
-    ctx.arc(halfWidth, y, 40, 0, TAU)
-    ctx.fill()
-  }
+  })
 
   // Draw the road
   if (COLOR_road_rainbow) {
@@ -398,6 +400,10 @@ let drawWorld = () => {
       }
     }
   } else if (COLOR_road_grid) {
+    if (COLOR_stars) {
+      // Reproduce a bug where COLOR_stars would bleed into here
+      ctx.fillStyle = COLOR_stars
+    }
     ctx.fillRect(0, abyss_y1 + abyss_h, canvasWidth, canvasHeight)
 
     let is = 1
@@ -569,19 +575,21 @@ let drawWorld = () => {
   }
   
   // Draw the abyss, unless there's a wall
-  let hasJumpWall = 0
-  for (let i = 0; i < RENDER_DIST; i++) hasJumpWall ||= map[((player_y|0) + i) % map_len_y][10];
-  if (!hasJumpWall) {
-    ctx.filter = 'blur(10px)'
-    ctx.fillStyle = COLOR_abyss_color
-    ctx.fillRect(
-      abyss_x1_gradual(abyss_x1) - 5, 
-      abyss_y1 - 5, 
-      abyss_w_gradual(x_end - x_start) + 10, 
-      (abyss_h|0) + 10
-    )
-    ctx.filter = 'none'
-  }
+  if_multiphase_draw(PHASE_ABYSS, () => {
+    let hasJumpWall = 0
+    for (let i = 0; i < RENDER_DIST; i++) hasJumpWall ||= map[((player_y|0) + i) % map_len_y][10];
+    if (!hasJumpWall) {
+      ctx.filter = 'blur(10px)'
+      ctx.fillStyle = COLOR_abyss_color
+      ctx.fillRect(
+        abyss_x1_gradual(abyss_x1) - 5, 
+        abyss_y1 - 5, 
+        abyss_w_gradual(x_end - x_start) + 10, 
+        (abyss_h|0) + 10
+      )
+      ctx.filter = 'none'
+    }
+  })
 
   /*
   // Draw debug fake 3D lines
