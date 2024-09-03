@@ -93,8 +93,8 @@ let screen_x_at_distance = (x, distance) => {
 
 /** @returns {Array<[x, hit_x, hit_y, distance]>} */
 let get_distance_buffer = () => {
-  let x = 0
-  return range(((canvasWidth + 20) / iter_step) | 0, () => {
+  let x = -40
+  return range(((canvasWidth + 80) / iter_step) | 0, () => {
     x += iter_step
     let turn = CURRENT_TURN * .3
     let spread = -abs(CURRENT_TURN * .05)
@@ -451,15 +451,120 @@ let drawWorld = () => {
   }
 
   if (!COLOR_wall_hidden) {
-    for (let [x, hit_x, distance, z_offset, height] of distance_buffer) {
+    let mid_buffer = round(distance_buffer.length / 2)
+
+    const draw_at = ([x, hit_x, distance, z_offset, height], right) => {
+      const is_wall = hit_x === 0 || hit_x === map_len_x - 1
       let how_far = inv_lerp(RENDER_DIST, 0, distance)
       how_far = clamp(0, 1, how_far)
 
+      // Fish-eye lens (start of screen)
+      let lens_effect = remap(canvasWidth * 0, canvasWidth * 0.3, 1, 0, x)
+      // Fish-eye lens (end of screen)
+      let lens_effect_end = remap(canvasWidth * 1, canvasWidth * 0.7, 1, 0, x)
+
+      if (lens_effect > 0) lens_effect = lens_effect ** 2
+      if (lens_effect_end > 0) lens_effect_end = lens_effect_end ** 2
+
+      let lens_effect_signed =
+        lens_effect > 0 ? lens_effect
+        : lens_effect_end > 0 ? -lens_effect_end
+        : 0
+
+      let lens_effect_either =
+        lens_effect > 0 ? lens_effect
+        : lens_effect_end > 0 ? lens_effect_end
+        : 0
+
+      how_far = lerp(.1,.3,how_far) + (is_wall ? COLOR_tree_lum : COLOR_wall_lum)
+
+      how_far += (
+        lens_effect_either ** 3
+      ) * 0.2
+
+      how_far = min(how_far, 1)
+
       ctx.fillStyle =
-        hit_x === 0 || hit_x === map_len_x - 1
-          ? `hsl(${COLOR_tree_hue}deg, ${COLOR_tree_sat*100}%, ${(lerp(.1,.3,how_far) + COLOR_tree_lum) * 100}%)`
-          : `hsl(${COLOR_wall_hue}deg, ${COLOR_wall_sat*100}%, ${(lerp(.1,.3,how_far) + COLOR_wall_lum) * 100}%)`
-      ctx.fillRect(x, z_offset, 4, height)
+        is_wall
+          ? `hsl(${COLOR_tree_hue}deg, ${COLOR_tree_sat*100}%, ${how_far * 100}%)`
+          : `hsl(${COLOR_wall_hue}deg, ${COLOR_wall_sat*100}%, ${how_far * 100}%)`
+
+      // Fish-eye lens (start of screen)
+      if (lens_effect_signed) {
+        let bend_top = round(9 * lens_effect_signed)
+        let bend_mid = round(2 * lens_effect_signed)
+        let bend_top_up = round(17 * lens_effect_either)
+        let bend_mid_up = round(9 * lens_effect_either)
+
+        ctx.beginPath();
+
+        // TOP LEFT
+        ctx.moveTo(
+          x + bend_top,
+          z_offset - bend_top_up
+        )
+        // TOP RIGHT
+        ctx.lineTo(
+          x + 4 + bend_top,
+          z_offset - bend_top_up
+        )
+        // TOPMID RIGHT
+        ctx.lineTo(
+          x + 4 + bend_mid,
+          z_offset + (height * .25) - bend_mid_up
+        )
+        // MIDDLE RIGHT
+        ctx.lineTo(
+          x + 4,
+          z_offset + (height * .50)
+        )
+        // BOTMID RIGHT
+        ctx.lineTo(
+          x + 4 + bend_mid,
+          z_offset + (height * .75) + bend_mid_up
+        )
+        // BOTTOM RIGHT
+        ctx.lineTo(
+          x + 4 + bend_top,
+          z_offset + height + bend_top_up
+        )
+        // BOTTOM LEFT
+        ctx.lineTo(
+          x + bend_top,
+          z_offset + height + bend_top_up
+        )
+        // BOTMID LEFT
+        ctx.lineTo(
+          x + bend_mid,
+          z_offset + (height * .75) + bend_mid_up
+        )
+        // MIDDLE LEFT
+        ctx.lineTo(
+          x,
+          z_offset + (height * .50)
+        )
+        // TOPMID LEFT
+        ctx.lineTo(
+          x + bend_mid,
+          z_offset + (height * .25) - bend_mid_up
+        )
+        // TOP LEFT
+        ctx.lineTo(
+          x + bend_top,
+          z_offset - bend_top_up
+        )
+
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, z_offset, 4, height)
+      }
+    }
+
+    for (let i = mid_buffer - 1; i >= 0; i--) {
+      draw_at(distance_buffer[i], 0)
+    }
+    for (let i = mid_buffer; i < distance_buffer.length; i++) {
+      draw_at(distance_buffer[i], 1)
     }
   }
   

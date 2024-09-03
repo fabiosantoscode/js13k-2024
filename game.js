@@ -133,8 +133,7 @@ let firstUserInteraction = makePromise((resolve) => {
     c.onclick = resolve
 })
 
-ctx.font = '20px sans-serif'
-ctx.font = "20px 'Comic Sans MS'"
+ctx.font = "20px 'Comic Sans MS', sans-serif"
 ctx.textAlign = 'center'
 
 // START FRAMING (in minified mode, just sleep 1 frame).
