@@ -308,9 +308,9 @@ let game_generator = (function*() {
 
     // TODO yield* ending()
 })()
-let warn = function*(w) {
+let warn = function*(w, time) {
     warning = w;
-    yield* yield_time(800);
+    yield* yield_time(time||800);
     warning = '';
 }
 let screen_message_success = function*(w, time) {
@@ -342,11 +342,9 @@ let drawGoal = () => {
         warning = '';
     }
     ctx.fillStyle =
-        warning ? (
-            sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow'
-        )
-        : failure ? sin(GAME_TIME * 9) > 0 ? 'red' : 'purple'
-        : success ? sin(GAME_TIME * 9) > 0 ? 'purple' : 'blue'
+        warning ? (sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow')
+        : failure ? (sin(GAME_TIME * 9) > 0 ? 'red' : 'purple')
+        : success ? (sin(GAME_TIME * 9) > 0 ? 'purple' : 'blue')
         : COLOR_text_nth_place;
 
     ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + debug_info(), halfWidth, 20);
