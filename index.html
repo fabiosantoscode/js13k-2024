@@ -9,7 +9,8 @@ p,h1{margin:1rem;font-size:20px;text-align:center}
 h1{color:white}
 strong{color:rgb(168,68,168)}
 #sc{display:flex;justify-content:center;align-items:center}
-button{border:none;background:white;display:inline-block;padding:1em;min-width:0}
+button{border:15px solid transparent;background:transparent;display:inline-block;min-width:0}
+button b{background:white;padding:2em}
 [keys]{position:fixed;bottom:50px}
 [left]{text-align:left;left:50px}
 [right]{text-align:right;right:50px}
@@ -20,10 +21,8 @@ button{border:none;background:white;display:inline-block;padding:1em;min-width:0
 <!-- story -->
 <div id=sc>
 <canvas id=c width=320 height=180></canvas>
-<div keys left><button key=a>left</button>
-<button key=d>right</button></div>
-<div keys right><button key=" ">jump</button>
-<button key=w>accelerate</button></div>
+<div keys left><button key=a><b>left</b></button><button key=d><b>right</b></button></div>
+<div keys right><button key=" "><b>jump</b></button><button key=w><b>accelerate</b></button></div>
 </div>
 <p><br>
 <!-- snip -->

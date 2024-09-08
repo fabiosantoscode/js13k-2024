@@ -82,18 +82,47 @@ let keys = {}
 let setKey = (truth) => (e) => keys[e.key] = truth
 onkeydown = setKey(1)
 onkeyup = setKey()
-for (let button of document.all){
-  let k = button.getAttribute('key')
-  if (k) {
+for (let buttonGroup of document.querySelectorAll('[keys]')){
+  let touchButtons = [...buttonGroup.querySelectorAll('[key]')]
+  let touchButtonKeys = []
+  for (let button of touchButtons) {
+    let k = button.getAttribute('key')
+    touchButtonKeys.push(k)
+
+    let down = 0
+
     button.onpointerdown = e => {
       e.preventDefault()
-      keys[k] = 1
+      down = keys[k] = 1
       button.setPointerCapture(e.pointerId)
     }
     button.onpointerup = e => {
       e.preventDefault()
-      keys[k] = 0
+      for (let b of touchButtonKeys) keys[b] = down = 0
       button.releasePointerCapture(e.pointerId)
+    }
+    // Allow for rollover. One can start pressing right and then drag to the left and the ship should go left.
+    button.onpointermove = e => {
+      if (!down) return
+
+      for (let b of touchButtonKeys) keys[b] = 0
+
+      // Find which button is under the pointer and touch that key instead of all others
+      let keyUnderPointer = touchButtons
+        .find(b => {
+          let box = b.getBoundingClientRect()
+          return (
+            box.left < e.clientX
+            && box.right > e.clientX
+            && box.top < e.clientY
+            && box.bottom > e.clientY
+          )
+        })
+        ?.getAttribute('key')
+
+      if (keyUnderPointer) {
+        down = keys[keyUnderPointer] = 1
+      }
     }
   }
 }
@@ -133,7 +162,11 @@ let doFrame = () => {
 
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION
 let firstUserInteraction = makePromise((resolve) => {
+  if (self.env === 'production') {
+    c.onclick = CLICK.onclick = resolve
+  } else {
     c.onclick = resolve
+  }
 })
 
 ctx.font = "20px 'Comic Sans MS', sans-serif"
