@@ -115,7 +115,8 @@ let updatePlayer = () => {
     (async () => {
       let end = Date.now() + 1000
       while (Date.now() < end) {
-        player_x = lerp(player_x, map_len_x / 2, 0.3)
+        prev_mov_x = 0
+        player_x = mov_x = lerp(player_x, map_len_x / 2, 0.3)
         player_y += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
         player_y_nowrap += player_lunge_forward_as_a_result_of_hitting_a_wall_speed
         prev_mov_y = delayed_mov_y = player_speed + 0.4 // simulate high speed for other componets of the game
