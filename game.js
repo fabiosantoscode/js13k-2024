@@ -127,8 +127,6 @@ for (let buttonGroup of document.querySelectorAll('[keys]')){
   }
 }
 
-let isKeyPressed = k => !!keys[k]
-
 let game_start_time
 
 let update = () => {
