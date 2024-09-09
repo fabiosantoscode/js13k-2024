@@ -167,6 +167,7 @@ let game_generator = (function*() {
       yield* yield_space(100);
 
       yield* screen_message_success('Press A/D to move', 4000);
+      yield* screen_message_success('Press space to jump', 4000);
       yield* screen_message_success('Or tap buttons below', 4000);
       yield* screen_message_success('Please Finish In 13th Place', 4000);
     }

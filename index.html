@@ -2,18 +2,18 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width">
 <style>
-canvas{image-rendering:-moz-crisp-edges;image-rendering:-webkit-crisp-edges;image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:auto;border:0.30vw solid purple}
+canvas{image-rendering:-moz-crisp-edges;image-rendering:-webkit-crisp-edges;image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:auto;border:0.30vw solid hotpink}
 *{padding:0;margin:0;user-select:none}
-html,body,#sc{background:black;color:purple;line-height:1}
+html,body,#sc{background:black;color:fuchsia;line-height:1}
 p,h1{margin:1rem;line-height:1.5;font-size:20px;text-align:center}
 h1{color:white}
-strong{color:rgb(168,68,168)}
+strong{color:hotpink}
 #sc{display:flex;justify-content:center;align-items:center}
 button{border:15px solid transparent;background:transparent;display:inline-block;min-width:0}
-button b{background:white;padding:2em}
-[keys]{position:fixed;bottom:50px}
-[left]{text-align:left;left:50px}
-[right]{text-align:right;right:50px}
+button b{background:white;padding:20px}
+[keys]{position:fixed;bottom:20px}
+[left]{text-align:left;left:20px}
+[right]{text-align:right;right:20px}
 @media(min-aspect-ratio:320/180){canvas{height:100vh;width:auto;justify-self:center}}
 </style>
 <title>Please Finish In 13th Place</title>
@@ -21,7 +21,7 @@ button b{background:white;padding:2em}
 <div id=sc>
 <canvas id=c width=320 height=180></canvas>
 <div keys left><button key=a><b>left</b></button><button key=d><b>right</b></button></div>
-<div keys right><button key=" "><b>jump</b></button><button key=w><b>accelerate</b></button></div>
+<div keys right><button key=" "><b>jump</b></button></div>
 </div>
 <!-- snip -->
 <script src="game.js"></script>

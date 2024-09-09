@@ -33,7 +33,7 @@ let updatePlayer = () => {
   let mov_x = 0
   let mov_z = 0
 
-  if (keys['w']) mov_y += 1
+  // if (keys['w']) mov_y += 1 // acceleration
   // if (keys['s']) mov_y -= .5 // brakes
 
   if (keys['a']) mov_x -= 1
