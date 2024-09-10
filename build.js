@@ -26,7 +26,6 @@ async function getHtml({ minify = true }) {
             },
             // unsafe: true, // at the end
             passes: 5,
-            pure_new: true,
             pure_getters: true,
         },
         mangle: true,
@@ -38,8 +37,7 @@ async function getHtml({ minify = true }) {
         }
     })
 
-    return `${htmlBody}
-<script>${code}</script>`
+    return `${htmlBody}<script>${code}</script>`
 }
 
 

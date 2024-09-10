@@ -21,5 +21,9 @@ if (self.env === 'production') {
                     console.error(e)
                 }
             }
+
+            document.body.className += ' noScrl'
+            document.body.addEventListener('touchmove', e => e.preventDefault(), {passive: false})
+            document.body.addEventListener('touchstart', e => e.preventDefault(), {passive: false})
         })
 }
