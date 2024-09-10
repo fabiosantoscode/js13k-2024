@@ -108,8 +108,12 @@ let level_generator = function*(on_finish_cutscene, no_jump) {
     if (!no_jump) challenges.push(challenge_jump)
 
     while (1) {
-        // make sure we have space to do the challenge before the wrap around
-        if (abs(player_y - map_len_y) > map_len_y - 600) {
+        if (
+          // make sure we have space to do the challenge before the wrap around
+          abs(player_y - map_len_y) > map_len_y - 600
+          // no challenges during the cutscene
+          && !ENDING_CUTSCENE
+        ) {
             let chl = challenges[floor(random() * challenges.length)];
             yield * chl();
         }
@@ -174,14 +178,15 @@ let game_generator = (function*() {
 
     // DIFFICULTY = 0 - starts at zero
 
-    this_level_ends_at = player_y_nowrap + 3000
+    this_level_ends_at = player_y_nowrap + 1500
 
     yield* level_generator(() => {
+        // Neon night
         COLOR_stars = 'rgba(255,255,255,0.3)'
         COLOR_sky_gradient_start = '#3377cc'
-        COLOR_sky_gradient_end = 'black'
+        COLOR_sky_gradient_end = 'orange'
         COLOR_road_gradient_start = '#133'
-        COLOR_road_gradient_end = '#111'
+        COLOR_road_gradient_end = 'brown'
         COLOR_road_checkerboard = null
         COLOR_tree_hue = 320
         COLOR_wall_hue = 230
@@ -189,7 +194,7 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
     });
 
-    this_level_ends_at = player_y_nowrap + 3000
+    this_level_ends_at = player_y_nowrap + 2000
     DIFFICULTY = 2 / 6
     LEVEL = 2
 
@@ -201,7 +206,7 @@ let game_generator = (function*() {
         COLOR_sky_shapes = 1
         COLOR_road_gradient_start = null
         COLOR_road_gradient_end = null
-        COLOR_road_checkerboard = ['#ff89a4', '#1b1a1c']
+        COLOR_road_checkerboard = ['#dd7994', '#2b2a2c']
         COLOR_road_grid = null
         COLOR_tree_hue = 195.0
         COLOR_wall_hue = 34.0
@@ -211,7 +216,7 @@ let game_generator = (function*() {
         COLOR_wall_lum = .4
         COLOR_abyss_color = '#e1a1fe'
         COLOR_text_nth_place = '#87e7c0'
-        COLOR_player_brightness = 1.5
+        COLOR_player_brightness = 1.8
         COLOR_wall_randomness_biome = 8
     });
 
@@ -220,6 +225,7 @@ let game_generator = (function*() {
     LEVEL = 3
 
     yield* level_generator(() => {
+        // Digital red
         COLOR_stars = 'red'
         COLOR_road_gradient_start = 0
         COLOR_road_gradient_end = 0
@@ -229,7 +235,7 @@ let game_generator = (function*() {
         COLOR_tree_lum = .3
         COLOR_wall_hue = 145
         COLOR_wall_lum = .1
-        COLOR_player_brightness = 1.8
+        COLOR_player_brightness = 0
     });
 
     this_level_ends_at = player_y_nowrap + 3000
@@ -259,14 +265,17 @@ let game_generator = (function*() {
 
     yield* level_generator(() => {
         // Full circle. Colors were set by COLOR_reset_all_colors
-        
-    }, true);
+        // Though first, we go into a trippy black void
+        // Black void effect
+        COLOR_void = 1
+    }, 1);
 
     this_level_ends_at = Infinity
     DIFFICULTY = 6 / 6
     LEVEL = 6
 
     ENDING_CUTSCENE++
+
     if (goal_nth_place === 13) {
         yield* screen_message_success('Congratulations', 4000);
         yield* yield_time(400);
@@ -274,12 +283,11 @@ let game_generator = (function*() {
         yield* yield_time(400);
         yield* screen_message_success('You have failed Successfully', 4000);
         yield* yield_time(400);
-        yield* screen_message_success('You have worked hard and');
+        yield* screen_message_success('You have worked hard and', 4000);
         yield* yield_time(400);
         yield* screen_message_success('now the quadrillionaire', 4000);
         yield* yield_time(400);
-        yield* screen_message_success('Has bought another space yacht', 4000);
-        yield* yield_time(400);
+        yield* screen_message_success('bought another space yacht', 4000);
     } else if (goal_nth_place === 1) {
         yield* screen_message_success("Congratulations", 4000);
         yield* yield_time(400);
@@ -294,18 +302,29 @@ let game_generator = (function*() {
         yield* screen_message_success("And also DEAD ...", 4000);
         yield* yield_time(400);
         yield* screen_message_success("Should have Finish In 13th Place", 4000);
-        yield* yield_time(400);
     } else {
         yield* screen_message_failure('Unfortunately', 4000);
         yield* yield_time(400);
         yield* screen_message_failure('You have failed by succeeding', 4000);
         yield* yield_time(400);
-        yield* screen_message_failure('next time', 4000);
+        yield* screen_message_failure('Next time', 4000);
         yield* yield_time(400);
         yield* screen_message_failure('Please Finish In 13th Place', 4000);
-        yield* yield_time(400);
     }
+
+    this_level_ends_at = 0 // just the cutscene pls
+    yield* level_generator(() => {
+        // Full circle. Colors were set by COLOR_reset_all_colors
+        // Though first, we go into a trippy black void
+        // Black void effect
+        COLOR_void = 0
+    }, 1);
+
     ENDING_CUTSCENE--
+
+    this_level_ends_at = Infinity
+    DIFFICULTY = 6 / 6
+    LEVEL = 6
 
     // TODO yield* ending()
 })()
@@ -339,8 +358,11 @@ let warning = '';
 let success = '';
 let failure = '';
 let drawGoal = () => {
+    let text_y = 20
+
     if (ENDING_CUTSCENE) {
         warning = '';
+        text_y = 60
     }
     ctx.fillStyle =
         warning ? (sin(GAME_TIME * 9) > 0 ? 'red' : 'yellow')
@@ -348,5 +370,5 @@ let drawGoal = () => {
         : success ? (sin(GAME_TIME * 9) > 0 ? 'purple' : 'blue')
         : COLOR_text_nth_place;
 
-    ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + debug_info(), halfWidth, 20);
+    ctx.fillText(warning || success || failure || ordinal(goal_nth_place) + debug_info(), halfWidth, text_y);
 };

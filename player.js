@@ -22,7 +22,7 @@ let player_lunge_forward_as_a_result_of_hitting_a_wall_speed = 5
 
 // The player has no collision while jumping and inside the track
 let player_should_collide = () =>
-  !(player_z > 6 && player_x > 2 && player_x < map_len_x - 2) && !PLAYER_NO_COLLIDE
+  !(player_z > 6 && player_x > 2 && player_x < map_len_x - 2) && !PLAYER_NO_COLLIDE && !ENDING_CUTSCENE
 
 let sideways_force_from_turns_gradual = gradually_change(0, 0.05)
 
@@ -238,6 +238,8 @@ let create_hull = (center_x, center_y, prev_mov_x, global_turn) => {
   return [tip, botLeft, botRight, top]
 }
 
+let ending_cutscene_player_closer_gradual = gradually_change(0, 0.01)
+
 let drawPlayer = () => {
   // shake our guy with a sin()
   shaking = shaking += 8
@@ -288,6 +290,16 @@ let drawPlayer = () => {
     // Some rounding+noise
     coords[0] = (round(coords[0] * (5/6))) * (6/5)
     coords[1] = (round(coords[1] * (5/6))) * (6/5)    
+  }
+
+  let ending_cutscene_scale = ending_cutscene_player_closer_gradual(ENDING_CUTSCENE)
+  if (ending_cutscene_scale > 0.01) {
+    // tip down, top up
+    HULL[0][1] -= ending_cutscene_scale * -4
+    HULL[3][1] -= ending_cutscene_scale * 2
+    ending_cutscene_scale **= 2
+    shrink_hull(HULL, (ending_cutscene_scale * 1.2) + 1, (ending_cutscene_scale * 1.2) + 1)
+    move_hull(HULL, 0, ending_cutscene_scale * -40)
   }
 
   // Cast a shadow

@@ -127,6 +127,7 @@ let COLOR_abyss_color
 let COLOR_text_nth_place
 let COLOR_player_brightness
 let COLOR_wall_randomness_biome
+let COLOR_void
 let COLOR_reset_all_colors = () => {
   COLOR_stars = 0
   COLOR_moon = 0
@@ -148,21 +149,32 @@ let COLOR_reset_all_colors = () => {
   COLOR_wall_hidden = 0
   COLOR_abyss_color = 'rgba(255,200,200,.4)'
   COLOR_text_nth_place = 'green'
-  COLOR_player_brightness = 1
+  COLOR_player_brightness = 2
   COLOR_wall_randomness_biome = null
+  COLOR_void = 0
 }
 let _unused = COLOR_reset_all_colors()
 
 let checkerboard_animation_step = 0
 
 let stars = range(2000, () => {
-  return [(random()-.5) * canvasWidth * 2, (random()-.5) * canvasWidth * 2]
+  return [
+    (random()-.5) * canvasWidth * 2,
+    (random()-.5) * canvasWidth * 2,
+    1 - (random() ** 3), // Perceived distance
+  ]
 })
-let star_rotate_speed = -.002
+let star_rotate_speed = -.001
 
 let abyss_x1_gradual = gradually_change(0, 0.2)
 let abyss_w_gradual = gradually_change(0, 0.2)
 let drawWorld = () => {
+  if (COLOR_void) {
+    ctx.fillStyle = 'rgba(0,0,0,0.1)'
+    ctx.fillRect(0,0,canvasWidth,canvasHeight)
+    return
+  }
+
   // Change FOV according to speed
   let target_fov =
     CURRENT_TURN != 0
@@ -288,18 +300,22 @@ let drawWorld = () => {
       ctx.fillStyle = COLOR_stars
       for (let star of stars) {
         // Use this loop to rotate all stars as well to save space
-        let [x, y] = vec_rotate_around(...star, halfWidth / 2, halfHeight - 100, star_rotate_speed)
+        let [x, y] = vec_rotate_around(star[0], star[1], halfWidth / 2, halfHeight - 100, star_rotate_speed * star[2])
+
+        ctx.globalAlpha = star[2]
 
         star[0] = x
         star[1] = y
 
         ctx.beginPath()
         ctx.moveTo(x, y)
-        ctx.lineTo(x + 1, y + 1)
-        ctx.lineTo(x + 0, y + 2)
-        ctx.lineTo(x - 1, y + 1)
+        ctx.lineTo(x + .5, y + .5)
+        ctx.lineTo(x     , y + 1)
+        ctx.lineTo(x - .5, y + .5)
         ctx.lineTo(x, y)
         ctx.fill()
+
+        ctx.globalAlpha = 1
       }
     }
 

@@ -161,7 +161,10 @@ let doFrame = () => {
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION
 let firstUserInteraction = makePromise((resolve) => {
   if (self.env === 'production') {
-    c.onclick = CLICK.onclick = resolve
+    c.onclick = CLICK.onclick = () => {
+      resolve()
+      onCanvasClickFullscreen()
+    }
   } else {
     c.onclick = resolve
   }
