@@ -61,42 +61,47 @@ let drumWavePlan = async (plan, freqStart, freqEnd, frequency, gain, mod) => {
   }
 }
 
-let tabPlayer = function*([frequency, gain], tempo, mod, tab) {
-  for (;;) for (UNUSED_VAR of trimSplit(tab)) {
-    let [,note, octave, count = 1] = UNUSED_VAR.match(/^(\w#?|_)(\d?)x?(\d+)?$/)
-    if (note === 'x') {
-      drumWavePlan([
-        [1],
-        [.75, .7],
-        [.75, .7],
-        [.7],
-        [.57, .6],
-        [.27, .6],
-        [.17, .5],
-        [.1, .4],
-        [.1, .2],
-        [0],
-      ], 111, 255, frequency, gain, mod)
-    } else if (note === 'o') {
-      drumWavePlan([
-        [.4],
-        [.8],
-        [1],
-        [.75, .7],
-        [.7],
-        [.57, .6],
-        [.27, .6],
-        [.17, .5],
-        [.1, .4],
-        [.1, .2],
-        [0],
-      ], 15, 70, frequency, gain, mod)
-    } else {
-      let freq = getNoteFreq(note, octave);
-      setValue(frequency, freq * mod);
-    }
+let tabPlayer = function*([frequency, gain], tempo, mod, tab, endingSolo) {
+  for (;;) {
+    for (UNUSED_VAR of trimSplit(tab)) {
+      let [,note, octave, count = 1] = UNUSED_VAR.match(/^(\w#?|_)(\d?)x?(\d+)?$/)
 
-    for (UNUSED_VAR of range(tempo * count)) yield; 
+      if (ENDING_CUTSCENE ? endingSolo : 1) {
+        if (note === 'x') {
+          drumWavePlan([
+            [1],
+            [.75, .7],
+            [.75, .7],
+            [.7],
+            [.57, .6],
+            [.27, .6],
+            [.17, .5],
+            [.1, .4],
+            [.1, .2],
+            [0],
+          ], 111, 255, frequency, gain, mod)
+        } else if (note === 'o') {
+          drumWavePlan([
+            [.4],
+            [.8],
+            [1],
+            [.75, .7],
+            [.7],
+            [.57, .6],
+            [.27, .6],
+            [.17, .5],
+            [.1, .4],
+            [.1, .2],
+            [0],
+          ], 15, 70, frequency, gain, mod)
+        } else {
+          let freq = getNoteFreq(note, octave);
+          setValue(frequency, freq * mod);
+        }
+      }
+
+      for (UNUSED_VAR of range(tempo * count)) yield;
+    }
   }
 }
 
@@ -154,123 +159,126 @@ firstUserInteraction.then(() => {
 
 */
 
+let musicInitialize = () => {
+  audioCtx = new AudioContext();
+}
+
 // Original game music
 let drumTempo = (60_000 / (165 * 2)) / 2;
 
-let stopX3 = '_x24 '
-let stopX4 = stopX3 + '_x8 '
-
-let drum1 = 'o o x o o o x o '
-let drum2 = 'o o x o x o x o '
-let drumTab = ''
-// part 1
-+ drum1
-+ drum2
-// part 2
-+ drum2
-+ drum2
-
-let mainInstrumentPart1Motif = ''
-+ 'e3x2 _x2 e3x2 d3x2 e3x2 _x2 e3x2 _x2 '
-+ 'g3x2 _x2 g3x2 d3x2 g3x2 _x2 g3x2 _x2 '
-let mainInstrumentPart1Motif2 = ''
-+ 'e4x2 _x2 e4x2 _x2 e4 _ g4 _ b4x2 _x2 '
-
-let mainInstrumentPart2Cadence = note => (note + ' _ ').repeat(7) + note + 'x2 '
-let mainInstrumentPart2Bit1 = mainInstrumentPart2Cadence('e4')
-let mainInstrumentPart2Bit2 = 'e3 _ e3 _ g3 _ a3 _ b3 _ b3 _ a3 _ g3x2 '
-let mainInstrumentPart2Motif = ''
-+ mainInstrumentPart2Bit1
-+ mainInstrumentPart2Cadence('d4')
-let mainInstrumentPart2Motif2 = ''
-+ mainInstrumentPart2Bit1
-+ mainInstrumentPart2Cadence('g4')
-let mainInstrumentPart2Response = ''
-+ mainInstrumentPart2Bit2
-+ mainInstrumentPart2Bit2
-let mainInstrumentPart2Response2 = ''
-+ mainInstrumentPart2Bit2
-+ mainInstrumentPart2Cadence('e3')
-let mainInstrumentPart2Finish = ''
-+ mainInstrumentPart2Bit2
-+ 'b3 _ a3 _ a3x2 _x2 b3 _ a3 _ d3x2 _x2 '
-let mainInstrumentTab = ''
-// part 1
-+ mainInstrumentPart1Motif
-+ mainInstrumentPart1Motif2
-+ mainInstrumentPart1Motif2
-+ mainInstrumentPart1Motif
-+ mainInstrumentPart1Motif2
-+ 'e4x2 _x2 e4x2 _x2 e4 _ d4 _ e4x2 _x2 '
-// part 2
-+ mainInstrumentPart2Motif
-+ mainInstrumentPart2Response
-+ mainInstrumentPart2Motif
-+ mainInstrumentPart2Response2
-+ mainInstrumentPart2Motif2
-+ mainInstrumentPart2Response
-+ mainInstrumentPart2Motif
-+ mainInstrumentPart2Finish
-
-let secondInstrumentBit = 'b3x2 _x2 b3x2 _x2 b3 _ d4 _ e4x2 _x2 '
-let secondInstrumentPhrase = ''
-+ mainInstrumentPart2Cadence('b3')
-+ mainInstrumentPart2Cadence('a3')
-+ stopX4
-let secondInstrumentResponse = ''
-+ mainInstrumentPart2Cadence('b3')
-+ mainInstrumentPart2Cadence('d4')
-+ stopX4
-let secondInstrumentTab = ''
-// part 1
-+ stopX4
-+ secondInstrumentBit
-+ secondInstrumentBit
-+ stopX4
-+ secondInstrumentBit
-+ 'b3x2 _x2 b3x2 _x2 b3 _ a3 _ b3x2 _x2 '
-// part 2
-+ secondInstrumentPhrase
-+ secondInstrumentPhrase
-+ secondInstrumentResponse
-+ secondInstrumentPhrase
-
-let highPitchedSlowStart = ''
-+ 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
-+ 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
-let highPitchedPart1A = ''
-+ highPitchedSlowStart
-+ 'b5x2 _x2 g5x2 _x2 e5x8 '
-+ stopX3
-let highPitchedPart1B = ''
-+ highPitchedSlowStart
-+ 'b5x2 _x2 c6x2 _x2 e5x8 '
-+ stopX3
-
-let highPitchedFastStart = ''
-+ 'e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ '
-let highPitchedPart2A = ''
-+ highPitchedFastStart
-+ 'b5 _ b5 _ b5x4 '
-+ stopX4
-let highPitchedPart2B = ''
-+ highPitchedFastStart
-+ 'b5 _ a5 _ b5x4 '
-+ stopX4
-let highPitchedPart2C = ''
-+ highPitchedFastStart
-+ 'd6 _ e6 _ b5x4 '
-+ stopX4
-let highPitchedTab = ''
-+ highPitchedPart1A
-+ highPitchedPart1B
-+ highPitchedPart2A
-+ highPitchedPart2B
-+ highPitchedPart2C
-+ highPitchedPart2A
-
 let musicStartMainTheme = () => {
-  audioCtx = new AudioContext();
+  let stopX3 = '_x24 '
+  let stopX4 = stopX3 + '_x8 '
+
+  let drum1 = 'o o x o o o x o '
+  let drum2 = 'o o x o x o x o '
+  let drumTab = ''
+  // part 1
+  + drum1
+  + drum2
+  // part 2
+  + drum2
+  + drum2
+
+  let mainInstrumentPart1Motif = ''
+  + 'e3x2 _x2 e3x2 d3x2 e3x2 _x2 e3x2 _x2 '
+  + 'g3x2 _x2 g3x2 d3x2 g3x2 _x2 g3x2 _x2 '
+  let mainInstrumentPart1Motif2 = ''
+  + 'e4x2 _x2 e4x2 _x2 e4 _ g4 _ b4x2 _x2 '
+
+  let mainInstrumentPart2Cadence = note => (note + ' _ ').repeat(7) + note + 'x2 '
+  let mainInstrumentPart2Bit1 = mainInstrumentPart2Cadence('e4')
+  let mainInstrumentPart2Bit2 = 'e3 _ e3 _ g3 _ a3 _ b3 _ b3 _ a3 _ g3x2 '
+  let mainInstrumentPart2Motif = ''
+  + mainInstrumentPart2Bit1
+  + mainInstrumentPart2Cadence('d4')
+  let mainInstrumentPart2Motif2 = ''
+  + mainInstrumentPart2Bit1
+  + mainInstrumentPart2Cadence('g4')
+  let mainInstrumentPart2Response = ''
+  + mainInstrumentPart2Bit2
+  + mainInstrumentPart2Bit2
+  let mainInstrumentPart2Response2 = ''
+  + mainInstrumentPart2Bit2
+  + mainInstrumentPart2Cadence('e3')
+  let mainInstrumentPart2Finish = ''
+  + mainInstrumentPart2Bit2
+  + 'b3 _ a3 _ a3x2 _x2 b3 _ a3 _ d3x2 _x2 '
+  let mainInstrumentTab = ''
+  // part 1
+  + mainInstrumentPart1Motif
+  + mainInstrumentPart1Motif2
+  + mainInstrumentPart1Motif2
+  + mainInstrumentPart1Motif
+  + mainInstrumentPart1Motif2
+  + 'e4x2 _x2 e4x2 _x2 e4 _ d4 _ e4x2 _x2 '
+  // part 2
+  + mainInstrumentPart2Motif
+  + mainInstrumentPart2Response
+  + mainInstrumentPart2Motif
+  + mainInstrumentPart2Response2
+  + mainInstrumentPart2Motif2
+  + mainInstrumentPart2Response
+  + mainInstrumentPart2Motif
+  + mainInstrumentPart2Finish
+
+  let secondInstrumentBit = 'b3x2 _x2 b3x2 _x2 b3 _ d4 _ e4x2 _x2 '
+  let secondInstrumentPhrase = ''
+  + mainInstrumentPart2Cadence('b3')
+  + mainInstrumentPart2Cadence('a3')
+  + stopX4
+  let secondInstrumentResponse = ''
+  + mainInstrumentPart2Cadence('b3')
+  + mainInstrumentPart2Cadence('d4')
+  + stopX4
+  let secondInstrumentTab = ''
+  // part 1
+  + stopX4
+  + secondInstrumentBit
+  + secondInstrumentBit
+  + stopX4
+  + secondInstrumentBit
+  + 'b3x2 _x2 b3x2 _x2 b3 _ a3 _ b3x2 _x2 '
+  // part 2
+  + secondInstrumentPhrase
+  + secondInstrumentPhrase
+  + secondInstrumentResponse
+  + secondInstrumentPhrase
+
+  let highPitchedSlowStart = ''
+  + 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
+  + 'b5x2 _x2 g5x2 _x2 e5x2 _x2 '
+  let highPitchedPart1A = ''
+  + highPitchedSlowStart
+  + 'b5x2 _x2 g5x2 _x2 e5x8 '
+  + stopX3
+  let highPitchedPart1B = ''
+  + highPitchedSlowStart
+  + 'b5x2 _x2 c6x2 _x2 e5x8 '
+  + stopX3
+
+  let highPitchedFastStart = ''
+  + 'e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ e5 _ g5 _ b5 _ '
+  let highPitchedPart2A = ''
+  + highPitchedFastStart
+  + 'b5 _ b5 _ b5x4 '
+  + stopX4
+  let highPitchedPart2B = ''
+  + highPitchedFastStart
+  + 'b5 _ a5 _ b5x4 '
+  + stopX4
+  let highPitchedPart2C = ''
+  + highPitchedFastStart
+  + 'd6 _ e6 _ b5x4 '
+  + stopX4
+  let highPitchedTab = ''
+  + highPitchedPart1A
+  + highPitchedPart1B
+  + highPitchedPart2A
+  + highPitchedPart2B
+  + highPitchedPart2C
+  + highPitchedPart2A
+
   playTabs([
     [tabPlayer(instrument(0.3 * VOLUME_MOD, 'sawtooth'), 1, 1, mainInstrumentTab), 34],
     [tabPlayer(instrument(0.3 * VOLUME_MOD), 1, 1, mainInstrumentTab), 16],
@@ -282,6 +290,6 @@ let musicStartMainTheme = () => {
     [tabPlayer(instrument(0.3 * VOLUME_MOD), 1, 1, highPitchedTab), 16],
 
     // Drum
-    [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 0],
+    [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab, 1), 0],
   ])
 }

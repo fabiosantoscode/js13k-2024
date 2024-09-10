@@ -167,6 +167,7 @@ if (self.env === 'production') {
   ctx.fillText('CLICK TO START', halfWidth, halfHeight)
   c.onclick = CLICK.onclick = () => {
     c.onclick = CLICK.onclick = null
+    musicInitialize()
     musicStartMainTheme()
     doFrame()
     onCanvasClickFullscreen()
@@ -175,6 +176,7 @@ if (self.env === 'production') {
   // IN DEV WE JUST START THEM ANYWAY
   c.onclick = () => {
     c.onclick = null
+    musicInitialize()
     musicStartMainTheme()
   }
   onload = () => {

@@ -326,9 +326,9 @@ let game_generator = (function*() {
         // Though first, we go into a trippy black void
         // Black void effect
         COLOR_void = 0
+        ENDING_CUTSCENE--
     });
 
-    ENDING_CUTSCENE--
 
     this_level_ends_at = Infinity
     DIFFICULTY = 6 / 6
