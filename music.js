@@ -6,7 +6,7 @@
 
 let audioCtx
 
-let drumTempo = (60_000 / (120 * 2)) / 2;
+// let drumTempo = (60_000 / (120 * 2)) / 2;
 
 // A register to avoid Terser writing 'let' sometimes
 let UNUSED_VAR;
@@ -155,7 +155,7 @@ firstUserInteraction.then(() => {
 */
 
 // Original game music
-drumTempo = (60_000 / (165 * 2)) / 2;
+let drumTempo = (60_000 / (165 * 2)) / 2;
 
 let stopX3 = '_x24 '
 let stopX4 = stopX3 + '_x8 '
@@ -269,7 +269,7 @@ let highPitchedTab = ''
 + highPitchedPart2C
 + highPitchedPart2A
 
-firstUserInteraction.then(() => {
+let musicStartMainTheme = () => {
   audioCtx = new AudioContext();
   playTabs([
     [tabPlayer(instrument(0.3 * VOLUME_MOD, 'sawtooth'), 1, 1, mainInstrumentTab), 34],
@@ -284,4 +284,4 @@ firstUserInteraction.then(() => {
     // Drum
     [tabPlayer(instrument(0.0, 'square'), 2, 1, drumTab), 0],
   ])
-})
+}

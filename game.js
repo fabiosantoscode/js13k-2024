@@ -158,28 +158,27 @@ let doFrame = () => {
   setTimeout(doFrame, till_next_frame)
 }
 
-// MUSIC, FULLSCREEN, ETC, NEED INTERACTION
-let firstUserInteraction = makePromise((resolve) => {
-  if (self.env === 'production') {
-    c.onclick = CLICK.onclick = () => {
-      resolve()
-      onCanvasClickFullscreen()
-    }
-  } else {
-    c.onclick = resolve
-  }
-})
-
 ctx.font = "20px 'Comic Sans MS', sans-serif"
 ctx.textAlign = 'center'
 
-// START FRAMING (in minified mode, just sleep 1 frame).
+// MUSIC, FULLSCREEN, ETC, NEED INTERACTION
 if (self.env === 'production') {
-  firstUserInteraction.then(doFrame)
   ctx.fillStyle = 'purple'
   ctx.fillText('CLICK TO START', halfWidth, halfHeight)
+  c.onclick = CLICK.onclick = () => {
+    c.onclick = CLICK.onclick = null
+    musicStartMainTheme()
+    doFrame()
+    onCanvasClickFullscreen()
+  }
 } else {
+  // IN DEV WE JUST START THEM ANYWAY
+  c.onclick = () => {
+    c.onclick = null
+    musicStartMainTheme()
+  }
   onload = () => {
+    onload = null
     doFrame()
   }
 }
