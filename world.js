@@ -172,6 +172,8 @@ let drawWorld = () => {
   if (COLOR_void) {
     ctx.fillStyle = 'rgba(0,0,0,0.1)'
     ctx.fillRect(0,0,canvasWidth,canvasHeight)
+    ctx.fillStyle = `hsla(${(GAME_TIME_SECS * 777) % 360}deg,50%,50%,${1 - ((((GAME_TIME_SECS * 330) % 360) / 360) ** 4)})`
+    drawStars()
     return
   }
 
@@ -243,8 +245,37 @@ let drawWorld = () => {
   ctx.fillStyle = sky_grad
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
+  function drawStars() {
+    ctx.fillStyle = COLOR_stars
+    for (let star of stars) {
+      // Use this loop to rotate all stars as well to save space
+      let [x, y] = vec_rotate_around(star[0], star[1], halfWidth / 2, halfHeight - 100, star_rotate_speed * star[2])
+
+      ctx.globalAlpha = star[2]
+
+      star[0] = x
+      star[1] = y
+
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + .5, y + .5)
+      ctx.lineTo(x     , y + 1)
+      ctx.lineTo(x - .5, y + .5)
+      ctx.lineTo(x, y)
+      ctx.fill()
+
+      ctx.globalAlpha = 1
+    }
+
+  }
+
   // Draw the sky
   if_multiphase_draw(PHASE_SKY, () => {
+    // Draw stars
+    if (COLOR_stars) {
+      drawStars()
+    }
+
     if (COLOR_sky_shapes) {
       for (let [x, y, z, inv, inv2] of [
         [-50, 50, 11, -1, 1],
@@ -292,30 +323,6 @@ let drawWorld = () => {
         ctx.lineTo(round(x + 0 * scale), round(y + 2 * scale_y))
         ctx.lineTo(round(x + 0 * scale), round(y + 0 * scale_y))
         ctx.fill();  
-      }
-    }
-
-    // Draw stars
-    if (COLOR_stars) {
-      ctx.fillStyle = COLOR_stars
-      for (let star of stars) {
-        // Use this loop to rotate all stars as well to save space
-        let [x, y] = vec_rotate_around(star[0], star[1], halfWidth / 2, halfHeight - 100, star_rotate_speed * star[2])
-
-        ctx.globalAlpha = star[2]
-
-        star[0] = x
-        star[1] = y
-
-        ctx.beginPath()
-        ctx.moveTo(x, y)
-        ctx.lineTo(x + .5, y + .5)
-        ctx.lineTo(x     , y + 1)
-        ctx.lineTo(x - .5, y + .5)
-        ctx.lineTo(x, y)
-        ctx.fill()
-
-        ctx.globalAlpha = 1
       }
     }
 

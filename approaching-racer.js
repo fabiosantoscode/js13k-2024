@@ -1,5 +1,5 @@
 
-let approaching_racer_speed = default_mov_y - 0.2
+let approaching_racer_speed = () => (default_mov_y - 0.2) * /* see player.js */ lerp(1, 2, DIFFICULTY)
 
 // (see goal.js) an approaching racer. You must kick them in the back so they get more speed
 let hasApproachingRacerBeenHit = () =>
@@ -10,9 +10,9 @@ let updateApproachingRacer = () => {
     if (!APPROACHING_RACER) return
 
     let phase = APPROACHING_RACER[2]
-    if (phase == 1) APPROACHING_RACER[1] += approaching_racer_speed * 1.5
+    if (phase == 1) APPROACHING_RACER[1] += approaching_racer_speed() * 1.5
     // phase 2 is being kicked back forward
-    else APPROACHING_RACER[1] += approaching_racer_speed * 15
+    else APPROACHING_RACER[1] += approaching_racer_speed() * 15
 }
 let drawApproachingRacer = () => {
     if (!APPROACHING_RACER) return

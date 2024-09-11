@@ -98,6 +98,8 @@ let tabPlayer = function*([frequency, gain], tempo, mod, tab, endingSolo) {
           let freq = getNoteFreq(note, octave);
           setValue(frequency, freq * mod);
         }
+      } else {
+        setValue(frequency, 0)
       }
 
       for (UNUSED_VAR of range(tempo * count)) yield;

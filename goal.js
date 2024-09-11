@@ -103,7 +103,7 @@ let transition_level = function*(on_finish_cutscene) {
     let cutscene_end = Date.now() + 4000
     while (cutscene_end > Date.now()) {
         let y = (player_y + RENDER_DIST + 10) | 0
-        let y_end = y + 10
+        let y_end = y + 50
         while (y++ < y_end && y < map_len_y) {
             map[y][0] = true
             map[y][1] = true
@@ -317,7 +317,7 @@ let game_generator = (function*() {
     yield* screen_message_success("SPECIAL THANKS TO", 4000);
     yield* yield_time(400);
     yield* screen_message_success("GINA VASILE & TONI", 4000);
-    yield* yield_time(4000);
+    yield* yield_time(400);
 
     this_level_ends_at = 0 // just the cutscene pls
     yield* level_generator()
