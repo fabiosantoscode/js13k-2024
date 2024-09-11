@@ -316,7 +316,9 @@ let game_generator = (function*() {
     yield* yield_time(2000);
     yield* screen_message_success("SPECIAL THANKS TO", 4000);
     yield* yield_time(400);
-    yield* screen_message_success("GINA VASILE & TONI", 4000);
+    yield* screen_message_success("Gina Vasile & Toni", 4000);
+    yield* yield_time(400);
+    yield* screen_message_success("IgorFIE & Dosaki", 4000);
     yield* yield_time(400);
 
     this_level_ends_at = 0 // just the cutscene pls
