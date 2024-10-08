@@ -78,9 +78,14 @@ let vec_rotate_around = (x, y, origin_x, origin_y, ang) => {
 
 // INPUT
 let keys = {}
-let setKey = (truth) => (e) => keys[e.code] = truth
-onkeydown = setKey(1)
-onkeyup = setKey()
+onkeydown = (e) => {
+  e.preventDefault()
+  keys[e.code] = 1
+}
+onkeyup = (e) => {
+  e.preventDefault()
+  keys[e.code] = 0
+}
 for (let buttonGroup of document.querySelectorAll('[keys]')){
   let touchButtons = [...buttonGroup.querySelectorAll('[key]')]
   let touchButtonKeys = []
@@ -102,6 +107,7 @@ for (let buttonGroup of document.querySelectorAll('[keys]')){
     }
     // Allow for rollover. One can start pressing right and then drag to the left and the ship should go left.
     button.onpointermove = e => {
+      e.preventDefault()
       if (!down) return
 
       for (let b of touchButtonKeys) keys[b] = 0
