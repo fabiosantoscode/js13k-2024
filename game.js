@@ -1,6 +1,6 @@
 let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
-let {floor, ceil, round, sin, cos, tan, abs, min, max, random} = Math;
+let {floor, ceil, round, sin, cos, tan, abs, min, max, random, sqrt, log2} = Math;
 let canvasHeight = 180
 let canvasWidth = 320
 let halfHeight = canvasHeight / 2
@@ -32,7 +32,6 @@ let map_collide_point = (x, y) => {
 let makePromise = cb => new Promise(cb)
 let sleep = ms => makePromise(resolve => setTimeout(resolve, ms))
 let round_n = (num, n) => round(num / n) * n
-let floor_n = (num, n) => floor(num / n) * n
 let lerp = (from, to, much) => from + ((to - from) * much)
 let lerp_vec = ([from_x,from_y], [to_x,to_y], much) => [lerp(from_x, to_x, much), lerp(from_y, to_y, much)]
 let inv_lerp = (a, b, v) => (v - a) / (b - a)
@@ -63,7 +62,7 @@ let map_collide_line_segment = (player_x, player_y, mov_x, mov_y, delta=1/32) =>
   }
 }
 
-let vec_length = (x, y) => Math.sqrt(x**2, y**2)
+let vec_length = (x, y) => sqrt(x**2, y**2)
 let vec_rotate = (x, y, ang) => [
   x * cos(ang) - y * sin(ang),
   x * sin(ang) + y * cos(ang),
@@ -158,7 +157,7 @@ let doFrame = () => {
   setTimeout(doFrame, till_next_frame)
 }
 
-ctx.font = "20px 'Comic Sans MS', sans-serif"
+ctx.font = "20px Calibri,sans-serif"
 ctx.textAlign = 'center'
 
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION

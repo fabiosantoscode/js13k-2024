@@ -47,7 +47,7 @@ async function buildZip() {
     mkdirSync('/tmp/js13k/.build', { recursive: true })
     writeFileSync('/tmp/js13k/.build/index.html', html)
 
-    console.log(execSync(`zip -9 build.zip /tmp/js13k/.build/index.html`).toString())
+    console.log(execSync(`zip --junk-paths -9 build.zip /tmp/js13k/.build/index.html`).toString())
     console.log(execSync(`ls -al build.zip`).toString())
     console.log(execSync(`ls -alh build.zip`).toString())
 

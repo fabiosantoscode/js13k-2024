@@ -37,7 +37,7 @@ let instrument = (volume, waveShape) => {
     setValue(gainNode2.gain, document.visibilityState > 'v');
   });
   setValue(oscillator.frequency, 0);
-  setValue(gainNode.gain, Math.log2(1 + 0.025 * volume));
+  setValue(gainNode.gain, log2(1 + 0.025 * volume));
   oscillator.type = waveShape;
   oscillator.start();
   oscillator.connect(gainNode).connect(gainNode2).connect(audioCtx.destination);
