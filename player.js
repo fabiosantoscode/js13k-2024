@@ -33,14 +33,14 @@ let updatePlayer = () => {
   let mov_x = 0
   let mov_z = 0
 
-  if (keys['w']) mov_y += 1
-  // if (keys['s']) mov_y -= .5 // brakes
-  if (keys['a']) mov_x -= 1
-  if (keys['d']) mov_x += 1
+  if (keys.KeyW) mov_y += 1
+  // if (keys.s) mov_y -= .5 // brakes
+  if (keys.KeyA) mov_x -= 1
+  if (keys.KeyD) mov_x += 1
 
   // jump
   let z_deviation = player_z - player_natural_z;
-  if (keys[' '] && frames_in_natural_z > 5) {
+  if (keys.Space && frames_in_natural_z > 5) {
     mov_z = 3
     frames_in_natural_z = 0
   } else {

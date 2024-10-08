@@ -78,7 +78,7 @@ let vec_rotate_around = (x, y, origin_x, origin_y, ang) => {
 
 // INPUT
 let keys = {}
-let setKey = (truth) => (e) => keys[e.key] = truth
+let setKey = (truth) => (e) => keys[e.code] = truth
 onkeydown = setKey(1)
 onkeyup = setKey()
 for (let buttonGroup of document.querySelectorAll('[keys]')){
