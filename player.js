@@ -112,8 +112,8 @@ let updatePlayer = () => {
     player_iframes++
     // barrel roll into the center of the track
     (async () => {
-      let end = Date.now() + 1000
-      while (Date.now() < end) {
+      let end = game_now() + 1000
+      while (game_now() < end) {
         prev_mov_x = 0
         player_x = mov_x = lerp(player_x, map_len_x / 2, 0.3)
         player_y += player_lunge_forward_as_a_result_of_hitting_a_wall_speed

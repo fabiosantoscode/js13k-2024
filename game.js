@@ -1,5 +1,6 @@
 let identity = x=>x
 let range = (n, cb) => Array.from({ length: n }, cb);
+let { Math, setTimeout: setTimeout_native } = self;
 let {floor, ceil, round, sin, cos, tan, abs, min, max, random, sqrt, log2} = Math;
 let canvasHeight = 180
 let canvasWidth = 320
@@ -30,7 +31,8 @@ let map_collide_point = (x, y) => {
   return map[y][x]
 };
 let makePromise = cb => new Promise(cb)
-let sleep = ms => makePromise(resolve => setTimeout(resolve, ms))
+let sleep = ms => makePromise(resolve => game_set_timeout(resolve, ms))
+let sleep_native = ms => makePromise(resolve => setTimeout_native(resolve, ms))
 let round_n = (num, n) => round(num / n) * n
 let lerp = (from, to, much) => from + ((to - from) * much)
 let lerp_vec = ([from_x,from_y], [to_x,to_y], much) => [lerp(from_x, to_x, much), lerp(from_y, to_y, much)]
@@ -78,14 +80,14 @@ let vec_rotate_around = (x, y, origin_x, origin_y, ang) => {
 
 // INPUT
 let keys = {}
-onkeydown = (e) => {
-  e.preventDefault()
-  keys[e.code] = 1
+let preventKeyDefault = truth => e => {
+  if (['KeyW', 'KeyA', 'KeyD', 'Escape', 'Space'].includes(e.code)) {
+    e.preventDefault()
+    keys[e.code] = truth
+  }
 }
-onkeyup = (e) => {
-  e.preventDefault()
-  keys[e.code] = 0
-}
+onkeydown = preventKeyDefault(1)
+onkeyup = preventKeyDefault(0)
 for (let buttonGroup of document.querySelectorAll('[keys]')){
   let touchButtons = [...buttonGroup.querySelectorAll('[key]')]
   let touchButtonKeys = []
@@ -134,9 +136,28 @@ for (let buttonGroup of document.querySelectorAll('[keys]')){
 
 let game_start_time
 
+let game_set_timeout = (cb, time = 0) => {
+  if (currently_paused) {
+    on_unpause.push(() => {
+      game_set_timeout(cb, time)
+    })
+  } else {
+    let end_at_time = game_now() + time
+    let onEnd = () => {
+      let time_left = end_at_time - game_now()
+      if (time_left <= 0) cb()
+      setTimeout_native(onEnd, time_left)
+    }
+    setTimeout_native(onEnd)
+  }
+}
+let game_now = () => {
+  return (Date.now() - pause_cumulative_time)
+};
+
 let update = () => {
-  game_start_time||=Date.now()
-  GAME_TIME = Date.now() - game_start_time
+  game_start_time ||= game_now()
+  GAME_TIME = game_now() - game_start_time
   GAME_TIME_SECS += FRAME_DELTA_S
   updateWorld()
   updateApproachingRacer()
@@ -146,7 +167,6 @@ let update = () => {
 
 let iter_step = 2
 let draw = () => {
-  ctx.lineJoin = 'round'
   drawMultiPhase()
   drawWorld()
   drawApproachingRacer()
@@ -154,17 +174,25 @@ let draw = () => {
   drawGoal()
 }
 
-let doFrame = () => {
-  let start = Date.now()
+let default_loop = () => {
   update()
   draw()
+  return true
+}
+
+let doFrame = () => {
+  let start = Date.now()
+
+  pause_loop() || default_loop()
+
   // Our update(); draw(); produced time, let's offset it
   let till_next_frame = max(0, FRAME_DELTA_MS - (Date.now() - start))
-  setTimeout(doFrame, till_next_frame)
+  setTimeout_native(doFrame, till_next_frame)
 }
 
 ctx.font = "20px Calibri,sans-serif"
 ctx.textAlign = 'center'
+ctx.lineJoin = 'round'
 
 // MUSIC, FULLSCREEN, ETC, NEED INTERACTION
 if (self.env === 'production') {
@@ -174,6 +202,7 @@ if (self.env === 'production') {
     c.onclick = CLICK.onclick = null
     musicInitialize()
     musicStartMainTheme()
+    initialize_pause()
     doFrame()
     onCanvasClickFullscreen()
   }
@@ -186,6 +215,7 @@ if (self.env === 'production') {
   }
   onload = () => {
     onload = null
+    initialize_pause()
     doFrame()
   }
 }

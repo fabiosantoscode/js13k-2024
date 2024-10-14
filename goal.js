@@ -23,8 +23,8 @@ let ordinal = place => {
     }
 }
 let yield_time = function*(ms) {
-    ms += Date.now()
-    while (Date.now() < ms) yield;
+    ms += game_now()
+    while (game_now() < ms) yield;
 }
 let yield_space = function*(distance) {
     distance += player_y_nowrap
@@ -41,13 +41,13 @@ let challenge_hard_turn = function*() {
 }
 let challenge_jump = function*() {
     // receive a wall in front of you to jump over
-    let start = Date.now()
+    let start = game_now()
     yield* warn('JUMP')
     let jump_wall_y = (player_y + RENDER_DIST + 2) | 0
     for (let i = 0; i < map_len_x; i++) {
         map[jump_wall_y][i] = true // create a wall
     }
-    while (player_y < jump_wall_y && (Date.now() - start < 4_000)) {
+    while (player_y < jump_wall_y && (game_now() - start < 4_000)) {
         yield;
     }
     for (let i = 0; i < map_len_x; i++) {
@@ -61,10 +61,10 @@ let challenge_some_guy_in_front_of_you = function*() {
 
     // Another pilot comes, and you have to hit them in the back to make sure you remain in 13th place
     yield* warn(`${ordinal(goal_nth_place - 1)} CONTESTANT`)
-    let cancel_at = Date.now() + 8_000
+    let cancel_at = game_now() + 8_000
     while (1) {
         // CANCEL
-        if (player_y > 900 || (Date.now() > cancel_at)) {
+        if (player_y > 900 || (game_now() > cancel_at)) {
             // Cancel this (just to avoid infinite loop and math issues due to wrapping)
             break
         }
@@ -99,9 +99,9 @@ let transition_level = function*(on_finish_cutscene) {
     }
     PLAYER_NO_COLLIDE++
 
-    let cutscene_fadeout = Date.now() + 2500
-    let cutscene_end = Date.now() + 4000
-    while (cutscene_end > Date.now()) {
+    let cutscene_fadeout = game_now() + 2500
+    let cutscene_end = game_now() + 4000
+    while (cutscene_end > game_now()) {
         let y = (player_y + RENDER_DIST + 10) | 0
         let y_end = y + 50
         while (y++ < y_end && y < map_len_y) {
@@ -117,7 +117,7 @@ let transition_level = function*(on_finish_cutscene) {
             map[y][19] = true
         }
 
-        let fadeout_point = abs(Date.now() - cutscene_fadeout);
+        let fadeout_point = abs(game_now() - cutscene_fadeout);
         let f_fadeout_point = round_n(fadeout_point, 250) / 1000
         if (f_fadeout_point <= 1) {
             if (on_finish_cutscene && f_fadeout_point == 0) {
@@ -364,7 +364,7 @@ let updateGoal = () => {
 };
 let debug_info = () => {
     if (self.env === 'production') return '';
-    return ` `;
+    return ` ${game_now()}`;
 };
 let warning = '';
 let success = '';

@@ -47,9 +47,9 @@ let instrument = (volume, waveShape) => {
 let playTabs = async (tabs) => {
   while (1) {
     for (let [tab, delay] of tabs) {
-      sleep(delay).then(() => tab.next())
+      sleep_native(delay).then(() => tab.next())
     }
-    await sleep(drumTempo, 0);
+    await sleep_native(drumTempo, 0);
   }
 }
 
@@ -57,7 +57,7 @@ let drumWavePlan = async (plan, freqStart, freqEnd, frequency, gain, mod) => {
   for (UNUSED_VAR of plan) {
     setValue(frequency, lerp(freqStart, freqEnd, UNUSED_VAR[0]) * mod)
     setValue(gain, (UNUSED_VAR[1] || UNUSED_VAR[0]) * DRUM_VOLUME_MOD)
-    await sleep(10)
+    await sleep_native(10)
   }
 }
 
@@ -66,7 +66,10 @@ let tabPlayer = function*([frequency, gain], tempo, mod, tab, endingSolo) {
     for (UNUSED_VAR of trimSplit(tab)) {
       let [,note, octave, count = 1] = UNUSED_VAR.match(/^(\w#?|_)(\d?)x?(\d+)?$/)
 
-      if (ENDING_CUTSCENE ? endingSolo : 1) {
+      let should_mute =
+        currently_paused
+        || ENDING_CUTSCENE && endingSolo
+      if (!should_mute) {
         if (note === 'x') {
           drumWavePlan([
             [1],
