@@ -39,6 +39,7 @@ let challenge_hard_turn = function*() {
     let turn_towards = random() > 0.5 ? 1 : -1
     yield* warn(turn_towards < 0 ? 'HARD LEFT' : 'HARD RIGHT')
     goal_target_turn = turn_towards
+    goal_target_turn_sharpness = 2
     yield* yield_space(100)
     goal_target_turn = 0
 }
@@ -351,11 +352,10 @@ let permacurve_generator = (function* () { while (1) {
 
     if (current_challenge !== challenge_hard_turn) {
         const current_turn_end_time = GAME_TIME_SECS + lerp(0.5, 6, random())
-        const target_turn = lerp(-.6, .6, random())
-        goal_target_turn_sharpness = lerp(2, 8, random()) // how suddenly does this turn go into this angle
+        const target_turn = lerp((goal_target_turn/2) - .6, (goal_target_turn/2) + .6, random())
+        goal_target_turn_sharpness = lerp(0.3, 1.5, random()) // how suddenly does this turn go into this angle
 
         while (GAME_TIME_SECS < current_turn_end_time) {
-            goal_target_turn = target_turn
             yield
 
             if (current_challenge === challenge_hard_turn) {
@@ -364,6 +364,8 @@ let permacurve_generator = (function* () { while (1) {
                 goal_target_turn = 0
                 goal_target_turn_sharpness = 1
                 break
+            } else {
+                goal_target_turn = target_turn
             }
         }
     }
