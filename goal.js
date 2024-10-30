@@ -3,6 +3,7 @@
 let CURRENT_TURN = 0
 let goal_nth_place = 13
 let goal_target_turn = 0
+let goal_target_turn_sharpness = 1 // 1: smoothly turn. 2: sharply turn
 let PLAYER_NO_COLLIDE = 0
 /** 0..1 */
 let DIFFICULTY = 0
@@ -31,7 +32,9 @@ let yield_space = function*(distance) {
     while (player_y_nowrap < distance) yield;
 }
 // CHALLENGES
+let current_challenge
 let challenge_hard_turn = function*() {
+    yield // Grep NOTE_WAIT_1
     // Turn left and right, try not to hit walls
     let turn_towards = random() > 0.5 ? 1 : -1
     yield* warn(turn_towards < 0 ? 'HARD LEFT' : 'HARD RIGHT')
@@ -157,7 +160,9 @@ let level_generator = function*(no_jump) {
           && !ENDING_CUTSCENE
         ) {
             let chl = challenges[floor(random() * challenges.length)];
+            current_challenge = chl
             yield * chl();
+            current_challenge = null
         }
 
         yield * yield_space(90); // meters of track which are between challenges (decrease to increase difficulty)
@@ -340,6 +345,30 @@ let game_generator = (function*() {
 
     // TODO yield* ending()
 })()
+/** Generate a permanently changing CURRENT_TURN */
+let permacurve_generator = (function* () { while (1) {
+    yield;
+
+    if (current_challenge !== challenge_hard_turn) {
+        const current_turn_end_time = GAME_TIME_SECS + lerp(0.5, 6, random())
+        const target_turn = lerp(-.6, .6, random())
+        goal_target_turn_sharpness = lerp(2, 8, random()) // how suddenly does this turn go into this angle
+
+        while (GAME_TIME_SECS < current_turn_end_time) {
+            goal_target_turn = target_turn
+            yield
+
+            if (current_challenge === challenge_hard_turn) {
+                // Reset state for challenge_hard_turn to take over
+                // NOTE_WAIT_1: challenge_hard_turn yields 1 frame, so there's no chance this will interfere
+                goal_target_turn = 0
+                goal_target_turn_sharpness = 1
+                break
+            }
+        }
+    }
+
+} })()
 let warn = function*(w, time) {
     warning = w;
     yield* yield_time(time||800);
@@ -357,9 +386,10 @@ let screen_message_failure = function*(w, time) {
 }
 let updateGoal = () => {
     game_generator.next();
+    permacurve_generator.next();
 
     // Maintain CURRENT_TURN
-    CURRENT_TURN = lerp(CURRENT_TURN, goal_target_turn, 0.05);
+    CURRENT_TURN = lerp(CURRENT_TURN, goal_target_turn, 0.05 * goal_target_turn_sharpness);
     if (goal_target_turn == 0 && abs(CURRENT_TURN) < 0.05) CURRENT_TURN = 0;
 };
 let debug_info = () => {
