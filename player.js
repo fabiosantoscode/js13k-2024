@@ -4,10 +4,11 @@ let player_y_nowrap = 0
 let player_z = 3
 let player_natural_z = 1
 let player_natural_z_deviation = 2
-let player_speed = 1.7
+let player_speed = 1.6
+let player_x_speed = 1.8
 let player_iframes = 0 // ++ and --. we may have iframes for 2 reasons
 
-let player_inertia_x = 0.04
+let player_inertia_x = 0.1
 let player_inertia_y = 0.2
 let player_inertia_z = 0.1
 
@@ -81,7 +82,7 @@ let updatePlayer = () => {
   mov_y *= difficulty_speed_increase
 
   // try new position to see how we feel
-  mov_x = (mov_x * player_speed) + player_x
+  mov_x = (mov_x * player_x_speed) + player_x
   mov_y = (mov_y * player_speed) + player_y
   mov_z = mov_z + player_z
 

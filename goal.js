@@ -41,7 +41,9 @@ let challenge_hard_turn = function*() {
     goal_target_turn = turn_towards
     goal_target_turn_sharpness = 2
     yield* yield_space(100)
+    goal_target_turn_sharpness = 2
     goal_target_turn = 0
+    yield* yield_space(10)
 }
 let challenge_jump = function*() {
     // receive a wall in front of you to jump over
