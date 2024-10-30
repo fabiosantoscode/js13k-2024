@@ -68,7 +68,7 @@ let tabPlayer = function*([frequency, gain], tempo, mod, tab, endingSolo) {
 
       let should_mute =
         currently_paused
-        || ENDING_CUTSCENE && endingSolo
+        || ENDING_CUTSCENE && !endingSolo
       if (!should_mute) {
         if (note === 'x') {
           drumWavePlan([

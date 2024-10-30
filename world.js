@@ -487,8 +487,8 @@ let drawWorld = () => {
   if (!COLOR_wall_hidden) {
     let mid_buffer = round(distance_buffer.length / 2)
 
-    const draw_at = ([x, hit_x, distance, z_offset, height], right) => {
-      const is_wall = hit_x === 0 || hit_x === map_len_x - 1
+    let draw_at = ([x, hit_x, distance, z_offset, height], right) => {
+      let is_wall = hit_x === 0 || hit_x === map_len_x - 1
       let how_far = inv_lerp(RENDER_DIST, 0, distance)
       how_far = clamp(0, 1, how_far)
 

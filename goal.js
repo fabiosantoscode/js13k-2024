@@ -12,9 +12,6 @@ let ENDING_CUTSCENE = 0
 
 let APPROACHING_RACER
 
-let this_level_ends_at = 0
-let distance_till_next_level = () => this_level_ends_at - player_y_nowrap
-
 let ordinal = place => {
     if (ENDING_CUTSCENE) {
         return ''
@@ -85,6 +82,9 @@ let challenge_some_guy_in_front_of_you = function*() {
         if (hasApproachingRacerBeenSurpassed()) {
             goal_nth_place--
             yield* screen_message_success('FAILURE')
+            throw {
+                resetLevel: ['KICK THEM FORWARD', 'TRY AGAIN', 'FINISH IN 13TH PLACE']
+            }
             break
         }
         yield;
@@ -93,9 +93,13 @@ let challenge_some_guy_in_front_of_you = function*() {
     APPROACHING_RACER = 0
 }
 let DEBUG_skip_to_level
+let DEBUG_force_challenge
 if (self.env !== 'production') {
-    let l = +new URLSearchParams(location.search).get('level')
-    if (l) DEBUG_skip_to_level = l
+    let level = +new URLSearchParams(location.search).get('level')
+    if (level) DEBUG_skip_to_level = level
+    
+    let chall = new URLSearchParams(location.search).get('challenge')
+    if (chall) DEBUG_force_challenge = chall
 }
 let transition_level = function*(on_finish_cutscene) {
     if (DEBUG_skip_to_level > LEVEL) {
@@ -140,37 +144,70 @@ let transition_level = function*(on_finish_cutscene) {
 
     PLAYER_NO_COLLIDE--
 }
-let level_generator = function*(no_jump) {
+let level_generator = function*(level_length, no_jump) {
     if (self.env !== 'production') {
         if (DEBUG_skip_to_level > LEVEL) {
             return
         }
     }
 
-    let challenges =
-        //[challenge_some_guy_in_front_of_you]
-        [challenge_some_guy_in_front_of_you, challenge_hard_turn]
-    if (!no_jump) challenges.push(challenge_jump)
+    RETRY_WHEN_DEAD: while (1) {
+        let this_level_ends_at = player_y_nowrap + level_length
 
-    // Yield at the start so we can appreciate the scenery
-    yield* yield_space(200);
+        try {
+            let challenges =
+                //[challenge_some_guy_in_front_of_you]
+                [challenge_some_guy_in_front_of_you, challenge_hard_turn]
+            if (!no_jump) challenges.push(challenge_jump)
 
-    while (1) {
-        if (
-          // make sure we have space to do the challenge before the wrap around
-          abs(player_y - map_len_y) > map_len_y - 600
-          // no challenges during the cutscene
-          && !ENDING_CUTSCENE
-        ) {
-            let chl = challenges[floor(random() * challenges.length)];
-            current_challenge = chl
-            yield * chl();
+            if (self.env !== 'production') {
+                if (DEBUG_force_challenge) {
+                    challenges = DEBUG_force_challenge === 'hard_turn' ? [challenge_hard_turn] :
+                        DEBUG_force_challenge === 'some_guy' ? [challenge_some_guy_in_front_of_you] :
+                        DEBUG_force_challenge === 'jump' ? [challenge_jump] :
+                            (() => {
+                                throw new Error(DEBUG_force_challenge + ' unknown')
+                            })()
+                }
+            }
+
+            // Yield at the start so we can appreciate the scenery
+            yield* yield_space(200);
+
+            while (1) {
+                if (
+                // make sure we have space to do the challenge before the wrap around
+                abs(player_y - map_len_y) > map_len_y - 600
+                // no challenges during the cutscene
+                && !ENDING_CUTSCENE
+                ) {
+                    let chl = challenges[floor(random() * challenges.length)];
+                    current_challenge = chl
+                    yield * chl();
+                    current_challenge = null
+                }
+
+                yield * yield_space(90); // meters of track which are between challenges (decrease to increase difficulty)
+                let distance_till_next_level = this_level_ends_at - player_y_nowrap
+                if (distance_till_next_level < 200) {
+                    return
+                }
+            }
+        } catch (e) {
             current_challenge = null
-        }
+            goal_target_turn = 0
 
-        yield * yield_space(90); // meters of track which are between challenges (decrease to increase difficulty)
-        if (distance_till_next_level() < 200) {
-            break
+            let {resetLevel} = e
+            if (resetLevel) {
+                COLOR_void++
+                ENDING_CUTSCENE++
+                for (let msg of resetLevel) yield* screen_message_failure(msg, 4000)
+                ENDING_CUTSCENE--
+                COLOR_void--
+                continue
+            } else {
+                throw e
+            }
         }
     }
 }
@@ -189,8 +226,7 @@ let game_generator = (function*() {
 
     // DIFFICULTY = 0 - starts at zero
     // transition_level(() => {}) // do nothing here because it's the first level.
-    this_level_ends_at = player_y_nowrap + 1500
-    yield* level_generator()
+    yield* level_generator(1500)
 
     // Neon night
     yield* transition_level(() => {
@@ -205,10 +241,9 @@ let game_generator = (function*() {
         COLOR_abyss_color = 'rgba(180,50,150,.4)'
         COLOR_player_brightness = 1.8
     });
-    this_level_ends_at = player_y_nowrap + 1500
     DIFFICULTY = 2 / 6
     LEVEL = 2
-    yield* level_generator()
+    yield* level_generator(1500)
 
     // Macintosh plus
     yield* transition_level(() => {
@@ -231,10 +266,9 @@ let game_generator = (function*() {
         COLOR_player_brightness = 1.8
         COLOR_wall_randomness_biome = 8
     });
-    this_level_ends_at = player_y_nowrap + 2000
     DIFFICULTY = 3 / 6
     LEVEL = 3
-    yield* level_generator()
+    yield* level_generator(2000)
 
     // Digital red
     yield* transition_level(() => {
@@ -249,10 +283,9 @@ let game_generator = (function*() {
         COLOR_wall_lum = .1
         COLOR_player_brightness = 0
     });
-    this_level_ends_at = player_y_nowrap + 2000
     DIFFICULTY = 4 / 6
     LEVEL = 4
-    yield* level_generator()
+    yield* level_generator(2000)
 
     // Rainbow road
     yield* transition_level(() => {
@@ -270,10 +303,9 @@ let game_generator = (function*() {
         COLOR_wall_hidden = 1
         COLOR_wall_randomness_biome = 9
     });
-    this_level_ends_at = player_y_nowrap + 2500
     DIFFICULTY = 5 / 6
     LEVEL = 5
-    yield* level_generator(1 /* forbid jumps on rainbow road */)
+    yield* level_generator(2500, 1 /* forbid jumps on rainbow road */)
 
     // Trippy black void
     yield* transition_level(() => {
@@ -281,7 +313,6 @@ let game_generator = (function*() {
         // Full circle. Colors were set by COLOR_reset_all_colors
         COLOR_void = 1 // Black void effect
     })
-    this_level_ends_at = Infinity
     DIFFICULTY = 6 / 6
     LEVEL = 6
 
@@ -298,6 +329,7 @@ let game_generator = (function*() {
         yield* yield_time(400);
         yield* screen_message_success('bought another space yacht', 4000);
     } else if (goal_nth_place === 1) {
+        /* this is impossible now 
         yield* screen_message_success("Congratulations", 4000);
         yield* yield_time(400);
         yield* screen_message_success("You have Finish In 1th Place", 4000);
@@ -311,7 +343,9 @@ let game_generator = (function*() {
         yield* screen_message_success("And also DEAD ...", 4000);
         yield* yield_time(400);
         yield* screen_message_success("Should have Finish In 13th Place", 4000);
+        */
     } else {
+        /* this is impossible now 
         yield* screen_message_failure('Unfortunately', 4000);
         yield* yield_time(400);
         yield* screen_message_failure('You have failed by succeeding', 4000);
@@ -319,6 +353,7 @@ let game_generator = (function*() {
         yield* screen_message_failure('Next time', 4000);
         yield* yield_time(400);
         yield* screen_message_failure('Please Finish In 13th Place', 4000);
+        */
     }
 
     yield* yield_time(2000);
@@ -331,8 +366,7 @@ let game_generator = (function*() {
     yield* screen_message_success("IgorFIE & Dosaki", 4000);
     yield* yield_time(400);
 
-    this_level_ends_at = 0 // just the cutscene pls
-    yield* level_generator()
+    yield* level_generator(0)
     yield* transition_level(() => {
         // Full circle. Colors were set by COLOR_reset_all_colors
         // Though first, we go into a trippy black void
@@ -342,7 +376,6 @@ let game_generator = (function*() {
     });
 
 
-    this_level_ends_at = Infinity
     DIFFICULTY = 6 / 6
     LEVEL = 6
 
@@ -353,8 +386,8 @@ let permacurve_generator = (function* () { while (1) {
     yield;
 
     if (current_challenge !== challenge_hard_turn) {
-        const current_turn_end_time = GAME_TIME_SECS + lerp(0.5, 6, random())
-        const target_turn = lerp((goal_target_turn/2) - .6, (goal_target_turn/2) + .6, random())
+        let current_turn_end_time = GAME_TIME_SECS + lerp(0.5, 6, random())
+        let target_turn = lerp((goal_target_turn/2) - .6, (goal_target_turn/2) + .6, random())
         goal_target_turn_sharpness = lerp(0.3, 1.5, random()) // how suddenly does this turn go into this angle
 
         while (GAME_TIME_SECS < current_turn_end_time) {
